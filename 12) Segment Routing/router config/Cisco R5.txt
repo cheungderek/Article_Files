@@ -1,0 +1,65 @@
+RP/0/0/CPU0:R5#show running-config 
+Sat May 12 03:07:23.340 UTC
+Building configuration...
+!! IOS XR Configuration 5.3.0
+!! Last configuration change at Sat May 12 03:06:55 2018 by derekc
+!
+hostname R5
+interface Loopback0
+ ipv4 address 10.10.10.5 255.255.255.255
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ ipv4 address 10.2.5.5 255.255.255.240
+ mpls
+  mtu 8000
+ !
+!
+interface GigabitEthernet0/0/0/1
+ ipv4 address 10.4.5.5 255.255.255.240
+ mpls
+  mtu 8000
+ !
+!
+interface GigabitEthernet0/0/0/2
+ shutdown
+!
+interface GigabitEthernet0/0/0/3
+ shutdown
+!
+interface GigabitEthernet0/0/0/4
+ shutdown
+!
+router isis 1
+ is-type level-2-only
+ net 49.0000.0000.0000.0001.00
+ segment-routing global-block 519000 524000
+ address-family ipv4 unicast
+  metric-style wide
+  mpls traffic-eng level-2-only
+  segment-routing mpls
+ !
+ interface Loopback0
+  passive
+  address-family ipv4 unicast
+   prefix-sid index 5
+  !
+ !
+ interface GigabitEthernet0/0/0/0
+  point-to-point
+  address-family ipv4 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/1
+  point-to-point
+  address-family ipv4 unicast
+  !
+ !
+!
+router isis 65100
+!
+mpls traffic-eng
+!
+end

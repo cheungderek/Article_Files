@@ -1,0 +1,104 @@
+RP/0/0/CPU0:XR8_Edge#show runn
+Sat Jan  6 03:01:54.279 UTC
+Building configuration...
+!! IOS XR Configuration 5.3.0
+!! Last configuration change at Sat Jan  6 02:59:50 2018 by derekc
+!
+hostname XR8_Edge
+line console
+ exec-timeout 0 0
+!
+line default
+ exec-timeout 0 0
+!
+interface Loopback0
+ description system
+ ipv4 address 10.10.200.8 255.255.255.255
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/1
+ description "to XR7_Edge"
+ ipv4 address 10.7.8.8 255.255.255.224
+!
+interface GigabitEthernet0/0/0/2
+ description "to XR4_Core"
+ ipv4 address 10.4.8.8 255.255.255.224
+!
+interface GigabitEthernet0/0/0/3
+ shutdown
+!
+interface GigabitEthernet0/0/0/4
+ shutdown
+!
+interface GigabitEthernet0/0/0/5
+ description "to customer8's subnet"
+ ipv4 address 88.88.88.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0/6
+ shutdown
+!
+interface GigabitEthernet0/0/0/7
+ shutdown
+!
+prefix-set customer_nets
+  88.88.88.0/24
+end-set
+!
+community-set AS65200_East
+  65200:48
+end-set
+!
+community-set AS65200_West
+  65200:37
+end-set
+!
+route-policy pass-all
+  pass
+end-policy
+!
+route-policy export_customer_nets
+  if destination in customer_nets then
+    set community AS65200_East
+  else
+    drop
+  endif
+end-policy
+!
+router ospf 1
+ area 0.0.0.0
+  interface Loopback0
+  !
+  interface GigabitEthernet0/0/0/1
+  !
+  interface GigabitEthernet0/0/0/2
+  !
+ !
+!
+router bgp 65200
+ bgp router-id 10.10.200.8
+ address-family ipv4 unicast
+  network 88.88.88.0/24
+ !
+ neighbor 10.10.200.3
+  remote-as 65200
+  description "iBGP RR client to XR3_Core RR to tag export routes with AS65200_East"
+  update-source Loopback0
+  address-family ipv4 unicast
+   route-policy export_customer_nets out
+  !
+ !
+ neighbor 10.10.200.4
+  remote-as 65200
+  description "iBGP RR client to XR4_Core RR to tag export routes with AS65200_East"
+  update-source Loopback0
+  address-family ipv4 unicast
+   route-policy export_customer_nets out
+  !
+ !
+!
+end

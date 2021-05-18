@@ -1,0 +1,160 @@
+RP/0/0/CPU0:ASBR2_Cisco#show runn
+Thu Nov  2 15:31:27.019 UTC
+Building configuration...
+!! IOS XR Configuration 6.0.0
+!! Last configuration change at Thu Nov  2 14:07:11 2017 by cisco
+!
+hostname ASBR2_Cisco
+line console
+ exec-timeout 0 0
+!
+line default
+ exec-timeout 0 0
+!
+interface Loopback0
+ description "system"
+ ipv4 address 172.0.0.22 255.255.255.255
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ description "to ASBR1_Nokia"
+ ipv4 address 10.11.22.22 255.255.255.0
+!
+interface GigabitEthernet0/0/0/1
+ description "to ASBR3_Nokia"
+ ipv4 address 10.22.33.22 255.255.255.0
+!
+interface GigabitEthernet0/0/0/2
+ description "to PE2_Cisco"
+ ipv4 address 10.2.22.22 255.255.255.0
+!
+interface GigabitEthernet0/0/0/3
+ shutdown
+!
+interface GigabitEthernet0/0/0/4
+ shutdown
+!
+interface GigabitEthernet0/0/0/5
+ shutdown
+!
+interface GigabitEthernet0/0/0/6
+ shutdown
+!
+interface GigabitEthernet0/0/0/7
+ shutdown
+!
+prefix-set PS_IPV4_BGP_LU_LOOPBACKS
+  172.0.0.22/32,
+  10.2.22.22/32,
+  172.0.0.2/32,
+  172.0.0.33/32,
+  10.22.33.33/24,
+  172.0.0.11/32,
+  172.0.0.1/32,
+  172.0.0.3/32,
+  10.11.22.11/24
+end-set
+!
+route-policy IN
+  pass
+end-policy
+!
+route-policy OUT
+  pass
+end-policy
+!
+route-policy RP_IPV4_BGP_LU
+  if destination in PS_IPV4_BGP_LU_LOOPBACKS then
+    pass
+  endif
+end-policy
+!
+router static
+ address-family ipv4 unicast
+  10.11.22.11/32 GigabitEthernet0/0/0/0
+  10.22.33.33/32 GigabitEthernet0/0/0/1
+ !
+!
+router ospf 1
+ router-id 172.0.0.22
+ mpls ldp auto-config
+ area 0.0.0.0
+  interface Loopback0
+  !
+  interface GigabitEthernet0/0/0/2
+   mpls ldp sync
+  !
+ !
+!
+router bgp 65002
+ bgp router-id 172.0.0.22
+ mpls activate
+  interface GigabitEthernet0/0/0/0
+  interface GigabitEthernet0/0/0/1
+ !
+ bgp log neighbor changes detail
+ address-family ipv4 unicast
+  network 172.0.0.22/32
+  allocate-label all
+ !
+ address-family vpnv4 unicast
+ !
+ neighbor 10.2.22.2
+  remote-as 65002
+  update-source GigabitEthernet0/0/0/2
+  address-family ipv4 labeled-unicast
+   next-hop-self
+  !
+ !
+ neighbor 172.0.0.2
+  remote-as 65002
+  shutdown
+  update-source Loopback0
+  address-family ipv4 labeled-unicast
+   next-hop-self
+  !
+ !
+ neighbor 10.11.22.11
+  remote-as 65001
+  description "to ASBR1_Nokia"
+  address-family ipv4 labeled-unicast
+   send-community-ebgp
+   route-policy IN in
+   route-policy OUT out
+   send-extended-community-ebgp
+  !
+  address-family vpnv4 unicast
+   route-policy IN in
+   route-policy OUT out
+  !
+ !
+ neighbor 10.22.33.33
+  remote-as 65003
+  description "to ASBR3_Nokia"
+  address-family ipv4 labeled-unicast
+   send-community-ebgp
+   route-policy RP_IPV4_BGP_LU in
+   route-policy RP_IPV4_BGP_LU out
+   send-extended-community-ebgp
+  !
+ !
+!
+mpls oam
+!
+mpls ldp
+ router-id 172.0.0.22
+ address-family ipv4
+  label
+   local
+    allocate for host-routes
+   !
+  !
+ !
+ interface GigabitEthernet0/0/0/2
+ !
+!
+end
+
+RP/0/0/CPU0:ASBR2_Cisco#

@@ -1,0 +1,80 @@
+RP/0/0/CPU0:XR7_Edge#show running-config 
+Thu Jan  4 01:59:18.693 UTC
+Building configuration...
+!! IOS XR Configuration 5.3.0
+!! Last configuration change at Thu Jan  4 01:35:07 2018 by derekc
+!
+hostname XR7_Edge
+line console
+ exec-timeout 0 0
+!
+line default
+ exec-timeout 0 0
+!
+interface Loopback0
+ description system
+ ipv4 address 10.10.200.7 255.255.255.255
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/1
+ description "to XR8_Edge"
+ ipv4 address 10.7.8.7 255.255.255.224
+!
+interface GigabitEthernet0/0/0/2
+ description "to XR3_Core"
+ ipv4 address 10.3.7.7 255.255.255.224
+!
+interface GigabitEthernet0/0/0/3
+ shutdown
+!
+interface GigabitEthernet0/0/0/4
+ shutdown
+!
+interface GigabitEthernet0/0/0/5
+ description "to Customer7's subnet"
+ ipv4 address 77.77.77.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0/6
+ shutdown
+!
+interface GigabitEthernet0/0/0/7
+ shutdown
+!
+route-policy pass-all
+  pass
+end-policy
+!
+router ospf 1
+ area 0.0.0.0
+  interface Loopback0
+  !
+  interface GigabitEthernet0/0/0/1
+  !
+  interface GigabitEthernet0/0/0/2
+  !
+ !
+!
+router bgp 65200
+ bgp router-id 10.10.200.7
+ address-family ipv4 unicast
+  network 77.77.77.0/24
+ !
+ neighbor 10.10.200.3
+  remote-as 65200
+  update-source Loopback0
+  address-family ipv4 unicast
+  !
+ !
+ neighbor 10.10.200.4
+  remote-as 65200
+  update-source Loopback0
+  address-family ipv4 unicast
+  !
+ !
+!
+end

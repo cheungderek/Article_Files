@@ -1,0 +1,477 @@
+A:SR-6# admin display-config 
+# TiMOS-B-14.0.R5 both/i386 Nokia 7750 SR Copyright (c) 2000-2016 Nokia.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Wed Sep 28 15:56:57 PDT 2016 by builder in /rel14.0/b1/R5/panos/main
+
+# Generated MON AUG 28 22:26:21 2017 UTC
+
+exit all
+configure
+#--------------------------------------------------
+echo "System Configuration"
+#--------------------------------------------------
+    system
+        name "SR-6"
+        contact "Derek Cheung"
+        location "Nokia Antwerp Lab Hypervisor 10.15.14.170"
+        chassis-mode d
+        dns
+        exit
+        rollback
+            rollback-location "cf3:\rollbacks\config-R6.cfg"
+            local-max-checkpoints 20
+        exit
+        snmp                          
+            streaming
+                no shutdown
+            exit
+            packet-size 9216
+        exit
+        time
+            sntp
+                server-address 138.203.180.3 
+                no shutdown
+            exit
+            dst-zone CEST
+                start last sunday march 02:00
+                end last sunday october 02:00
+            exit
+            zone CEST 01
+        exit
+        thresholds
+            rmon
+            exit
+        exit
+    exit
+#--------------------------------------------------
+echo "System Security Configuration"  
+#--------------------------------------------------
+    system
+        security
+            telnet-server
+            password
+                attempts 7 time 1 lockout 1
+            exit
+            snmp
+                community "uTdc9j48PBRkxn5DcSjchk" hash2 rwa version both
+            exit
+            ssh
+                preserve-key
+                version 1-2
+            exit
+            no per-peer-queuing
+            cpu-protection
+                link-specific-rate max
+                policy 254 create
+                exit
+                policy 255 create
+                exit
+                port-overall-rate 15000 
+            exit                      
+        exit
+    exit
+#--------------------------------------------------
+echo "System Login Control Configuration"
+#--------------------------------------------------
+    system
+        login-control
+            ssh
+                inbound-max-sessions 15
+            exit
+            telnet
+                inbound-max-sessions 15
+            exit
+            idle-timeout disable
+        exit
+    exit
+#--------------------------------------------------
+echo "Log Configuration"
+#--------------------------------------------------
+    log 
+        snmp-trap-group 98
+            description "5620sam"
+            trap-target "ECB1D7429911:main1" address 192.168.193.11 snmpv2c notify-community "privatetrap98"
+        exit 
+        log-id 98
+            from main security change 
+            to snmp 1024
+            no shutdown
+        exit
+    exit 
+#--------------------------------------------------
+echo "System Security Cpm Hw Filters, PKI, TLS and LDAP Configuration"
+#--------------------------------------------------
+    system
+        security
+        exit
+    exit
+#--------------------------------------------------
+echo "QoS Policy Configuration"
+#--------------------------------------------------
+    qos
+    exit
+#--------------------------------------------------
+echo "Card Configuration"
+#--------------------------------------------------
+    card 1                            
+        card-type iom3-xp-b
+        mda 1
+            mda-type m20-1gb-sfp
+            no shutdown
+        exit
+        no shutdown
+    exit
+#--------------------------------------------------
+echo "Port Configuration"
+#--------------------------------------------------
+    port 1/1/1
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/2
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/3                        
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/4
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/5
+        ethernet
+            mode access
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/6
+        shutdown
+        ethernet
+        exit
+    exit                              
+    port 1/1/7
+        ethernet
+        exit
+        no shutdown
+    exit
+    port 1/1/8
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/9
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/10
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/11
+        shutdown
+        ethernet                      
+        exit
+    exit
+    port 1/1/12
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/13
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/14
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/15
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/16                       
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/17
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/18
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/19
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/20
+        shutdown
+        ethernet
+        exit                          
+    exit
+#--------------------------------------------------
+echo "System Sync-If-Timing Configuration"
+#--------------------------------------------------
+    system
+        sync-if-timing
+            begin
+            commit
+        exit
+    exit
+#--------------------------------------------------
+echo "Management Router Configuration"
+#--------------------------------------------------
+    router management
+    exit
+
+#--------------------------------------------------
+echo "Router (Network Side) Configuration"
+#--------------------------------------------------
+    router Base
+        interface "system"
+            address 10.10.100.6/32
+            no shutdown               
+        exit
+        interface "toPC10"
+            address 10.6.10.1/24
+            description "port 1/1/5 to PC10's eth0 10.6.10.100/24"
+            no shutdown
+        exit
+        interface "toR2"
+            address 10.2.6.6/27
+            port 1/1/4
+            bfd 300 receive 300 multiplier 3
+            no shutdown
+        exit
+        interface "toR5"
+            shutdown
+            address 10.5.6.6/27
+            port 1/1/2
+        exit
+        autonomous-system 65501
+#--------------------------------------------------
+echo "ISIS Configuration"
+#--------------------------------------------------
+        isis 0
+            area-id 49.0026           
+            authentication-key "eDqj7lA4JGH.tnbUboTxcU" hash2
+            authentication-type message-digest
+            traffic-engineering
+            reference-bandwidth 1000000000
+            interface "system"
+                no shutdown
+            exit
+            interface "toR2"
+                level-capability level-2
+                interface-type point-to-point
+                bfd-enable ipv4 include-bfd-tlv
+                no shutdown
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "IGMP Configuration"
+#--------------------------------------------------
+        igmp
+            interface "toPC10"
+                no shutdown
+            exit
+            no shutdown               
+        exit
+#--------------------------------------------------
+echo "PIM Configuration"
+#--------------------------------------------------
+        pim
+            interface "toR2"
+            exit
+            rp
+                static
+                exit
+                bsr-candidate
+                    shutdown
+                exit
+                rp-candidate
+                    shutdown
+                exit
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "MPLS Configuration"
+#--------------------------------------------------
+        mpls                          
+            interface "system"
+                no shutdown
+            exit
+            interface "toR2"
+                no shutdown
+            exit
+        exit
+#--------------------------------------------------
+echo "RSVP Configuration"
+#--------------------------------------------------
+        rsvp
+            interface "system"
+                no shutdown
+            exit
+            interface "toR2"
+                bfd-enable
+                no shutdown
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "MPLS LSP Configuration"
+#--------------------------------------------------
+        mpls
+            path "loose"
+                no shutdown
+            exit
+            path "path_toR5"
+                hop 1 10.10.100.2 strict
+                hop 2 10.10.100.1 strict
+                hop 3 10.10.100.5 strict
+                no shutdown
+            exit
+            path "path_toR8"
+                hop 1 10.10.100.2 strict
+                hop 2 10.10.100.4 strict
+                hop 3 10.10.100.8 strict
+                no shutdown
+            exit
+            lsp "lsp_toR5"
+                to 10.10.100.5
+                cspf
+                primary "path_toR5"
+                exit
+                secondary "loose"
+                exit                  
+                no shutdown
+            exit
+            lsp "lsp_toR8"
+                to 10.10.100.8
+                cspf
+                primary "path_toR8"
+                exit
+                secondary "loose"
+                exit
+                no shutdown
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "LDP Configuration"
+#--------------------------------------------------
+        ldp
+            interface-parameters
+            exit
+            targeted-session
+                peer 10.10.100.8
+                    no shutdown
+                exit                  
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "Web Portal Protocol Configuration"
+#--------------------------------------------------
+    exit
+
+#--------------------------------------------------
+echo "Service Configuration"
+#--------------------------------------------------
+    service
+        sdp 5 mpls create
+            far-end 10.10.100.5
+            lsp "lsp_toR5"
+            keep-alive
+                shutdown
+            exit
+            no shutdown
+        exit
+        sdp 8 mpls create
+            far-end 10.10.100.8
+            lsp "lsp_toR8"            
+            keep-alive
+                shutdown
+            exit
+            no shutdown
+        exit
+        customer 1 create
+            description "Default customer"
+        exit
+        customer 7 create
+            description "Telenet"
+        exit
+        vpls 400 customer 7 create
+            service-mtu 1914
+            stp
+                shutdown
+            exit
+            sap 1/1/5 create
+                no shutdown
+            exit
+            mesh-sdp 5:400 create
+                no shutdown
+            exit
+            mesh-sdp 8:400 create     
+                no shutdown
+            exit
+            no shutdown
+        exit
+    exit
+#--------------------------------------------------
+echo "Router (Service Side) Configuration"
+#--------------------------------------------------
+    router Base
+#--------------------------------------------------
+echo "ISIS Configuration"
+#--------------------------------------------------
+        isis 0
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "IGMP Configuration"
+#--------------------------------------------------
+        igmp
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "PIM Configuration"              
+#--------------------------------------------------
+        pim
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "BGP Configuration"
+#--------------------------------------------------
+        bgp
+            shutdown
+        exit
+    exit
+
+
+exit all
+
+# Finished MON AUG 28 22:26:24 2017 UTC  

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<lab name="7750 and Juniper VPLS interop" version="1" scripttimeout="300" lock="1">
+  <topology>
+    <nodes>
+      <node id="1" name="7750SR-R7" type="qemu" template="timos" image="timos-13.0.R4" console="telnet" cpu="1" ram="2048" ethernet="6" uuid="00000000-0000-0071-0194-000000000087" delay="0" icon="Router.png" config="0" left="147" top="378">
+        <interface id="1" name="1/1/1" type="ethernet" network_id="1"/>
+        <interface id="2" name="1/1/2" type="ethernet" network_id="7"/>
+        <interface id="4" name="1/1/4" type="ethernet" network_id="4"/>
+      </node>
+      <node id="2" name="vMX-R9" type="qemu" template="vmx" image="vmx-14.1.R1" console="telnet" cpu="1" ram="2048" ethernet="10" uuid="26c4be64-0198-40d9-941a-b847aa98cdec" delay="0" icon="JuniperMX.png" config="1" left="396" top="369">
+        <interface id="2" name="em2 / ge-0/0/0" type="ethernet" network_id="1"/>
+        <interface id="3" name="em3 / ge-0/0/1" type="ethernet" network_id="3"/>
+        <interface id="4" name="em4 / ge-0/0/2" type="ethernet" network_id="6"/>
+      </node>
+      <node id="3" name="7750SR-R8" type="qemu" template="timos" image="timos-13.0.R4" console="telnet" cpu="1" ram="2048" ethernet="6" uuid="00000000-0000-0071-0194-000000000087" delay="0" icon="Router.png" config="0" left="396" top="177">
+        <interface id="1" name="1/1/1" type="ethernet" network_id="3"/>
+        <interface id="2" name="1/1/2" type="ethernet" network_id="2"/>
+        <interface id="4" name="1/1/4" type="ethernet" network_id="5"/>
+      </node>
+      <node id="4" name="VPC-77" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="Desktop.png" config="0" left="72" top="504">
+        <interface id="0" name="eth0" type="ethernet" network_id="4"/>
+      </node>
+      <node id="5" name="VPC-88" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="Desktop.png" config="0" left="471" top="27">
+        <interface id="0" name="eth0" type="ethernet" network_id="5"/>
+      </node>
+      <node id="6" name="VPC-99" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="Desktop.png" config="0" left="477" top="498">
+        <interface id="0" name="eth0" type="ethernet" network_id="6"/>
+      </node>
+      <node id="7" name="7750SR-R6" type="qemu" template="timos" image="timos-13.0.R4" console="telnet" cpu="1" ram="2048" ethernet="6" uuid="00000000-0000-0071-0194-000000000087" delay="0" icon="Router.png" config="0" left="150" top="174">
+        <interface id="1" name="1/1/1" type="ethernet" network_id="2"/>
+        <interface id="2" name="1/1/2" type="ethernet" network_id="7"/>
+        <interface id="4" name="1/1/4" type="ethernet" network_id="8"/>
+      </node>
+      <node id="9" name="VPC-66" type="vpcs" template="vpcs" image="" ethernet="1" delay="0" icon="Desktop.png" config="0" left="78" top="24">
+        <interface id="0" name="eth0" type="ethernet" network_id="8"/>
+      </node>
+    </nodes>
+    <networks>
+      <network id="1" type="bridge" name="Net-7750SRiface_1" left="204" top="238" visibility="0"/>
+      <network id="3" type="bridge" name="Net-7750SR-R8iface_1" left="294" top="97" visibility="0"/>
+      <network id="4" type="bridge" name="Net-VPC4iface_0" left="96" top="304" visibility="0"/>
+      <network id="5" type="bridge" name="Net-VPC5iface_0" left="363" top="64" visibility="0"/>
+      <network id="6" type="bridge" name="Net-VPC6iface_0" left="696" top="328" visibility="0"/>
+      <network id="2" type="bridge" name="Net-7750SR-R6iface_1" left="363" top="244" visibility="0"/>
+      <network id="7" type="bridge" name="Net-7750SR-R6iface_2" left="363" top="244" visibility="0"/>
+      <network id="8" type="bridge" name="Net-VPC-66iface_0" left="354" top="70" visibility="0"/>
+    </networks>
+  </topology>
+  <objects>
+    <textobjects>
+      <textobject id="1" name="txt 1" type="text">
+        <data>PGRpdiBpZD0iY3VzdG9tVGV4dDEiIGNsYXNzPSJjdXN0b21TaGFwZSBjdXN0b21UZXh0IGNvbnRleHQtbWVudSBqc3BsdW1iLWRyYWdnYWJsZSB1aS1zZWxlY3RlZSBqc3BsdW1iLWRyYWctc2VsZWN0ZWQgdWktcmVzaXphYmxlIHVpLXNlbGVjdGVkIHVpLXJlc2l6YWJsZS1hdXRvaGlkZSBkcmFnc3RvcHBlZCIgZGF0YS1wYXRoPSIxIiBzdHlsZT0iZGlzcGxheTogaW5saW5lOyBwb3NpdGlvbjogYWJzb2x1dGU7IGxlZnQ6IDI1MnB4OyB0b3A6IDI4NXB4OyBjdXJzb3I6IG1vdmU7IHotaW5kZXg6IDEwMDE7Ij48cCBhbGlnbj0iY2VudGVyIiBzdHlsZT0idmVydGljYWwtYWxpZ246dG9wO2NvbG9yOiMwMDAwMDA7YmFja2dyb3VuZC1jb2xvcjojZmZmZmZmO2ZvbnQtc2l6ZToyMHB4O2ZvbnQtd2VpZ2h0OiBub3JtYWw7IiBjbGFzcz0idWktc2VsZWN0ZWUgdWktc2VsZWN0ZWQiPlZQTFMgNDAwPC9wPjxkaXYgY2xhc3M9InVpLXJlc2l6YWJsZS1oYW5kbGUgdWktcmVzaXphYmxlLWUgdWktc2VsZWN0ZWUgdWktc2VsZWN0ZWQiIHN0eWxlPSJ6LWluZGV4OiA5MDsgZGlzcGxheTogbm9uZTsiPjwvZGl2PjxkaXYgY2xhc3M9InVpLXJlc2l6YWJsZS1oYW5kbGUgdWktcmVzaXphYmxlLXMgdWktc2VsZWN0ZWUgdWktc2VsZWN0ZWQiIHN0eWxlPSJ6LWluZGV4OiA5MDsgZGlzcGxheTogbm9uZTsiPjwvZGl2PjxkaXYgY2xhc3M9InVpLXJlc2l6YWJsZS1oYW5kbGUgdWktcmVzaXphYmxlLXNlIHVpLWljb24gdWktaWNvbi1ncmlwc21hbGwtZGlhZ29uYWwtc2UgdWktc2VsZWN0ZWUgdWktc2VsZWN0ZWQiIHN0eWxlPSJ6LWluZGV4OiA5MDsgZGlzcGxheTogbm9uZTsiPjwvZGl2PjwvZGl2Pg==</data>
+      </textobject>
+    </textobjects>
+    <configs>
+      <config id="2">IApzZXQgdmVyc2lvbiAxNC4xUjEuMTAKc2V0IHN5c3RlbSBob3N0LW5hbWUgSnVuaXBlcl92TVgKc2V0IHN5c3RlbSByb290LWF1dGhlbnRpY2F0aW9uIGVuY3J5cHRlZC1wYXNzd29yZCAiJDEkNFowTGVkTmMkWU1HQWlSNkpaRXJlLkw3UnVJd1F3LyIKc2V0IHN5c3RlbSBzeXNsb2cgdXNlciAqIGFueSBlbWVyZ2VuY3kKc2V0IHN5c3RlbSBzeXNsb2cgZmlsZSBtZXNzYWdlcyBhbnkgbm90aWNlCnNldCBzeXN0ZW0gc3lzbG9nIGZpbGUgbWVzc2FnZXMgYXV0aG9yaXphdGlvbiBpbmZvCnNldCBzeXN0ZW0gc3lzbG9nIGZpbGUgaW50ZXJhY3RpdmUtY29tbWFuZHMgaW50ZXJhY3RpdmUtY29tbWFuZHMgYW55CnNldCBpbnRlcmZhY2VzIGdlLTAvMC8wIHVuaXQgMCBmYW1pbHkgaW5ldCBhZGRyZXNzIDEwLjcuOS45LzI3CnNldCBpbnRlcmZhY2VzIGdlLTAvMC8wIHVuaXQgMCBmYW1pbHkgbXBscwpzZXQgaW50ZXJmYWNlcyBnZS0wLzAvMSB1bml0IDAgZmFtaWx5IGluZXQgYWRkcmVzcyAxMC44LjkuOS8yNwpzZXQgaW50ZXJmYWNlcyBnZS0wLzAvMSB1bml0IDAgZmFtaWx5IG1wbHMKc2V0IGludGVyZmFjZXMgZ2UtMC8wLzIgZW5jYXBzdWxhdGlvbiBldGhlcm5ldC12cGxzCnNldCBpbnRlcmZhY2VzIGdlLTAvMC8yIHVuaXQgMCBmYW1pbHkgdnBscwpzZXQgaW50ZXJmYWNlcyBsbzAgdW5pdCAwIGZhbWlseSBpbmV0IGFkZHJlc3MgMTAuMTAuMTAwLjkvMzIKc2V0IHByb3RvY29scyBtcGxzIGludGVyZmFjZSBnZS0wLzAvMS4wCnNldCBwcm90b2NvbHMgbXBscyBpbnRlcmZhY2UgZ2UtMC8wLzAuMApzZXQgcHJvdG9jb2xzIG9zcGYgYXJlYSAwLjAuMC4wIGludGVyZmFjZSBnZS0wLzAvMC4wIGludGVyZmFjZS10eXBlIHAycApzZXQgcHJvdG9jb2xzIG9zcGYgYXJlYSAwLjAuMC4wIGludGVyZmFjZSBsbzAuMCBwYXNzaXZlCnNldCBwcm90b2NvbHMgb3NwZiBhcmVhIDAuMC4wLjAgaW50ZXJmYWNlIGdlLTAvMC8xLjAgaW50ZXJmYWNlLXR5cGUgcDJwCnNldCBwcm90b2NvbHMgbGRwIGludGVyZmFjZSBnZS0wLzAvMC4wCnNldCBwcm90b2NvbHMgbGRwIGludGVyZmFjZSBnZS0wLzAvMS4wCnNldCBwcm90b2NvbHMgbGRwIGludGVyZmFjZSBsbzAuMApzZXQgcm91dGluZy1pbnN0YW5jZXMgdjEgaW5zdGFuY2UtdHlwZSB2cGxzCnNldCByb3V0aW5nLWluc3RhbmNlcyB2MSBpbnRlcmZhY2UgZ2UtMC8wLzIuMApzZXQgcm91dGluZy1pbnN0YW5jZXMgdjEgcHJvdG9jb2xzIHZwbHMgbm8tdHVubmVsLXNlcnZpY2VzCnNldCByb3V0aW5nLWluc3RhbmNlcyB2MSBwcm90b2NvbHMgdnBscyB2cGxzLWlkIDQwMApzZXQgcm91dGluZy1pbnN0YW5jZXMgdjEgcHJvdG9jb2xzIHZwbHMgbmVpZ2hib3IgMTAuMTAuMTAwLjcKc2V0IHJvdXRpbmctaW5zdGFuY2VzIHYxIHByb3RvY29scyB2cGxzIG5laWdoYm9yIDEwLjEwLjEwMC44Cgo=</config>
+    </configs>
+  </objects>
+  <objects/>
+</lab>

@@ -1,0 +1,43 @@
+root@ipterm_55:~# ifconfig eth0
+eth0      Link encap:Ethernet  HWaddr ea:a5:2d:70:c7:12  
+          inet addr:192.168.55.2  Bcast:192.168.55.255  Mask:255.255.255.0
+          inet6 addr: fe80::e8a5:2dff:fe70:c712/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:12716 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:46393 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:500 
+          RX bytes:972642 (949.8 KiB)  TX bytes:1996022 (1.9 MiB)
+
+
+root@ipterm_55:~# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.55.1    0.0.0.0         UG    0      0        0 eth0
+192.168.55.0    0.0.0.0         255.255.255.0   U     0      0        0 eth0
+224.0.0.0       0.0.0.0         255.0.0.0       U     0      0        0 eth0
+239.0.0.0       0.0.0.0         255.0.0.0       U     0      0        0 eth0
+
+
+
+
+
+
+
+
+
+root@ipterm_66-2(STB):~# ifconfig eth0
+eth0      Link encap:Ethernet  HWaddr 22:96:57:c9:32:01  
+          inet addr:192.168.66.2  Bcast:192.168.66.255  Mask:255.255.255.0
+          inet6 addr: fe80::2096:57ff:fec9:3201/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:55899 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2729 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:500 
+          RX bytes:3442788 (3.2 MiB)  TX bytes:147702 (144.2 KiB)
+
+
+root@ipterm_66-2(STB):~# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.66.1    0.0.0.0         UG    0      0        0 eth0
+192.168.66.0    0.0.0.0         255.255.255.0   U     0      0        0 eth0

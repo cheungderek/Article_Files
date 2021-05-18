@@ -1,0 +1,1190 @@
+
+http://ggconsole.blogspot.ca/2016/10/cisco-mpls-vpn-inter-as-with-asbrs.html
+
+
+
+show clock
+Thu Oct 13 21:12:21.280 UTC
+21:12:22.200 UTC Thu Oct 13 2016
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show running-config
+Thu Oct 13 21:12:26.860 UTC
+Building configuration...
+!! IOS XR Configuration 6.0.0
+!! Last configuration change at Thu Oct 13 00:59:35 2016 by gerard
+!
+hostname XRV14
+logging console debugging
+cdp
+line console
+ exec-timeout 0 0
+!
+line default
+ exec-timeout 0 0
+!
+bfd
+ interface GigabitEthernet0/0/0/0
+ !
+ interface GigabitEthernet0/0/0/1
+ !
+ interface GigabitEthernet0/0/0/2
+ !
+ interface GigabitEthernet0/0/0/3
+ !
+ interface GigabitEthernet0/0/0/4
+ !
+ interface GigabitEthernet0/0/0/5
+ !
+ interface GigabitEthernet0/0/0/6
+ !
+ interface GigabitEthernet0/0/0/7
+ !
+ interface GigabitEthernet0/0/0/8
+ !
+!
+interface Loopback0
+ ipv4 address 65.0.0.14 255.255.255.255
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ cdp
+ ipv4 address 165.2.14.2 255.255.255.252
+!
+interface GigabitEthernet0/0/0/1
+ cdp
+ ipv4 address 165.6.14.2 255.255.255.252
+!
+interface GigabitEthernet0/0/0/2
+ cdp
+ ipv4 address 175.14.14.1 255.255.255.252
+!
+interface GigabitEthernet0/0/0/3
+ cdp
+!
+interface GigabitEthernet0/0/0/4
+ cdp
+!
+interface GigabitEthernet0/0/0/5
+ cdp
+!
+interface GigabitEthernet0/0/0/6
+ cdp
+!
+interface GigabitEthernet0/0/0/7
+ cdp
+!
+interface GigabitEthernet0/0/0/8
+ cdp
+!
+prefix-set AS1000_PEs
+  55.0.0.8/32,
+  55.0.0.9/32,
+  55.0.0.10/32,
+  55.0.0.11/32,
+  55.0.0.12/32,
+  55.0.0.13/32,
+  55.0.0.14/32,
+  55.0.0.16/32,
+  55.0.0.17/32
+end-set
+!
+as-path-set 101
+  ios-regex '_2033$',
+  ios-regex '_2035$',
+  ios-regex '_2037$',
+  ios-regex '_2039$',
+  ios-regex '_2041$',
+  ios-regex '_2043$'
+end-set
+!
+as-path-set 102
+  ios-regex '_2032$',
+  ios-regex '_2034$',
+  ios-regex '_2036$',
+  ios-regex '_2038$',
+  ios-regex '_2040$',
+  ios-regex '_2042$',
+  ios-regex '_2044$'
+end-set
+!
+as-path-set INET_AS2018
+  ios-regex '_2018$'
+end-set
+!
+as-path-set INET_AS2019
+  ios-regex '_2019$'
+end-set
+!
+route-policy IN
+  pass
+end-policy
+!
+route-policy OUT
+  pass
+end-policy
+!
+route-policy PASS
+  pass
+end-policy
+!
+route-policy AS1000_PEs
+  if source-prefix in AS1000_PEs then
+    pass
+  endif
+end-policy
+!
+router static
+ address-family ipv4 unicast
+  175.14.14.2/32 GigabitEthernet0/0/0/2
+ !
+!
+router isis 1
+ is-type level-2-only
+ net 49.0065.0000.0000.0014.00
+ address-family ipv4 unicast
+  metric-style wide
+  redistribute bgp 2000
+  mpls ldp auto-config
+ !
+ interface Loopback0
+  address-family ipv4 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/0
+  bfd minimum-interval 500
+  bfd multiplier 4
+  bfd fast-detect ipv4
+  address-family ipv4 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/1
+  bfd minimum-interval 500
+  bfd multiplier 4
+  bfd fast-detect ipv4
+  address-family ipv4 unicast
+  !
+ !
+!
+router bgp 2000
+ address-family ipv4 unicast
+  network 65.0.0.7/32
+  network 65.0.0.8/32
+  network 65.0.0.9/32
+  network 65.0.0.10/32
+  network 65.0.0.11/32
+  network 65.0.0.12/32
+  network 65.0.0.13/32
+  network 65.0.0.14/32
+  network 65.0.0.16/32
+  network 65.0.0.17/32
+  allocate-label all
+ !
+ address-family vpnv4 unicast
+ !
+ neighbor 65.0.0.7
+  remote-as 2000
+  update-source Loopback0
+  address-family vpnv4 unicast
+  !
+ !
+ neighbor 175.14.14.2
+  remote-as 1000
+  address-family ipv4 unicast
+   route-policy PASS in
+   route-policy PASS out
+  !
+  address-family ipv4 labeled-unicast
+   route-policy IN in
+   route-policy OUT out
+  !
+ !
+!
+mpls ldp
+ address-family ipv4
+ !
+!
+end
+
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show ip int brief | Exc unassigned
+Thu Oct 13 21:12:40.339 UTC
+
+Interface                      IP-Address      Status          Protocol Vrf-Name
+Loopback0                      65.0.0.14       Up              Up       default 
+GigabitEthernet0/0/0/0         165.2.14.2      Up              Up       default 
+GigabitEthernet0/0/0/1         165.6.14.2      Up              Up       default 
+GigabitEthernet0/0/0/2         175.14.14.1     Up              Up       default 
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show cdp neighbor
+Thu Oct 13 21:12:48.288 UTC
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater
+
+Device ID       Local Intrfce    Holdtme Capability Platform  Port ID
+XRV2            Gi0/0/0/0        158     R          IOS XRv S Gi0/0/0/5       
+XRV6            Gi0/0/0/1        147     R          IOS XRv S Gi0/0/0/5       
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show route vrf all
+Thu Oct 13 21:12:55.348 UTC
+
+VRF: **nVSatellite
+
+
+Codes: C - connected, S - static, R - RIP, B - BGP, (>) - Diversion path
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+       i - ISIS, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, su - IS-IS summary null, * - candidate default
+       U - per-user static route, o - ODR, L - local, G  - DAGR, l - LISP
+       A - access/subscriber, a - Application route
+       M - mobile route, r - RPL, (!) - FRR Backup path
+
+Gateway of last resort is not set
+
+L    10.0.0.1/32 is directly connected, 1w5d, nV-Loopback0
+L    10.0.0.2/32 is directly connected, 1w5d, nV-Loopback1
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show route
+Thu Oct 13 21:12:59.768 UTC
+
+Codes: C - connected, S - static, R - RIP, B - BGP, (>) - Diversion path
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+       i - ISIS, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, su - IS-IS summary null, * - candidate default
+       U - per-user static route, o - ODR, L - local, G  - DAGR, l - LISP
+       A - access/subscriber, a - Application route
+       M - mobile route, r - RPL, (!) - FRR Backup path
+
+Gateway of last resort is not set
+
+B    55.0.0.7/32 [20/3] via 175.14.14.2, 00:39:51
+B    55.0.0.8/32 [20/2] via 175.14.14.2, 20:21:03
+B    55.0.0.9/32 [20/2] via 175.14.14.2, 20:21:03
+B    55.0.0.10/32 [20/2] via 175.14.14.2, 20:21:03
+B    55.0.0.11/32 [20/2] via 175.14.14.2, 20:21:03
+B    55.0.0.12/32 [20/3] via 175.14.14.2, 20:21:03
+B    55.0.0.13/32 [20/3] via 175.14.14.2, 20:21:03
+B    55.0.0.14/32 [20/0] via 175.14.14.2, 20:21:03
+i L2 55.0.0.15/32 [115/20] via 165.2.14.1, 20:31:22, GigabitEthernet0/0/0/0
+                  [115/20] via 165.6.14.1, 20:31:22, GigabitEthernet0/0/0/1
+B    55.0.0.16/32 [20/2] via 175.14.14.2, 20:21:03
+B    55.0.0.17/32 [20/2] via 175.14.14.2, 20:21:03
+i L2 65.0.0.1/32 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 65.0.0.2/32 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 65.0.0.3/32 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.4/32 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.5/32 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.6/32 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.7/32 [115/40] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                 [115/40] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.8/32 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 65.0.0.9/32 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 65.0.0.10/32 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.11/32 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.12/32 [115/40] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/40] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 65.0.0.13/32 [115/40] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/40] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+L    65.0.0.14/32 is directly connected, 1w4d, Loopback0
+i L2 65.0.0.15/32 [115/30] via 165.2.14.1, 20:31:22, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 20:31:22, GigabitEthernet0/0/0/1
+i L2 65.0.0.16/32 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 65.0.0.17/32 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.1.2.0/30 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.1.3.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.1.4.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.1.8.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.1.9.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.1.12.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.1.13.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.1.16.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.2.3.0/30 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.2.4.0/30 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.2.8.0/30 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.2.9.0/30 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+C    165.2.14.0/30 is directly connected, 1w4d, GigabitEthernet0/0/0/0
+L    165.2.14.2/32 is directly connected, 1w4d, GigabitEthernet0/0/0/0
+i L2 165.2.15.0/30 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.2.16.0/30 [115/20] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+i L2 165.3.4.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.3.5.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.3.6.0/30 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.3.7.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.4.5.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.4.6.0/30 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.4.7.0/30 [115/30] via 165.2.14.1, 1w2d, GigabitEthernet0/0/0/0
+                  [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.5.6.0/30 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.5.10.0/30 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.5.11.0/30 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.5.12.0/30 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.5.13.0/30 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.5.17.0/30 [115/30] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.6.10.0/30 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.6.11.0/30 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+C    165.6.14.0/30 is directly connected, 1w4d, GigabitEthernet0/0/0/1
+L    165.6.14.2/32 is directly connected, 1w4d, GigabitEthernet0/0/0/1
+i L2 165.6.15.0/30 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+i L2 165.6.17.0/30 [115/20] via 165.6.14.1, 1w2d, GigabitEthernet0/0/0/1
+C    175.14.14.0/30 is directly connected, 1d18h, GigabitEthernet0/0/0/2
+L    175.14.14.1/32 is directly connected, 1d18h, GigabitEthernet0/0/0/2
+S    175.14.14.2/32 is directly connected, 1d18h, GigabitEthernet0/0/0/2
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show isis interface brief
+Thu Oct 13 21:13:16.096 UTC
+
+IS-IS 1 Interfaces
+    Interface      All     Adjs    Adj Topos  Adv Topos  CLNS   MTU    Prio  
+                   OK    L1   L2    Run/Cfg    Run/Cfg                L1   L2
+-----------------  ---  ---------  ---------  ---------  ----  ----  --------
+Lo0                Yes    -    0      1/1        1/1     Up    1500    -    - 
+Gi0/0/0/0          Yes    -    1*     1/1        1/1     Up    1497    -   64 
+Gi0/0/0/1          Yes    -    1*     1/1        1/1     Up    1497    -   64 
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show isis neighbor
+Thu Oct 13 21:13:24.616 UTC
+
+IS-IS 1 neighbors:
+System Id      Interface        SNPA           State Holdtime Type IETF-NSF
+XRV2           Gi0/0/0/0        500b.001b.0006 Up    20       L2   Capable 
+XRV6           Gi0/0/0/1        500b.001f.0006 Up    24       L2   Capable 
+
+Total neighbor count: 2
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show isis neighbor detail
+Thu Oct 13 21:13:30.625 UTC
+
+IS-IS 1 neighbors:
+System Id      Interface        SNPA           State Holdtime Type IETF-NSF
+XRV2           Gi0/0/0/0        500b.001b.0006 Up    24       L2   Capable 
+  Area Address(es): 49.0065
+  IPv4 Address(es): 165.2.14.1*
+  Topologies: 'IPv4 Unicast'
+  Uptime: 1w2d
+XRV6           Gi0/0/0/1        500b.001f.0006 Up    29       L2   Capable 
+  Area Address(es): 49.0065
+  IPv4 Address(es): 165.6.14.1*
+  Topologies: 'IPv4 Unicast'
+  Uptime: 1w2d
+
+Total neighbor count: 2
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls label range
+Thu Oct 13 21:13:37.335 UTC
+Range for dynamic labels: Min/Max: 24000/1048575
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls interface
+Thu Oct 13 21:13:45.934 UTC
+Interface                  LDP      Tunnel   Static   Enabled 
+-------------------------- -------- -------- -------- --------
+GigabitEthernet0/0/0/0     Yes      No       No       Yes
+GigabitEthernet0/0/0/1     Yes      No       No       Yes
+GigabitEthernet0/0/0/2     No       No       No       Yes
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls interface detail
+Thu Oct 13 21:13:51.614 UTC
+Interface GigabitEthernet0/0/0/0:
+        LDP labelling enabled
+        LSP labelling not enabled
+        MPLS enabled
+Interface GigabitEthernet0/0/0/1:
+        LDP labelling enabled
+        LSP labelling not enabled
+        MPLS enabled
+Interface GigabitEthernet0/0/0/2:
+        LDP labelling not enabled
+        LSP labelling not enabled
+        MPLS BGP-VPNv4 enabled
+        MPLS enabled
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls ldp neighbor | inc Peer
+Thu Oct 13 21:14:09.843 UTC
+Peer LDP Identifier: 65.0.0.2:0
+Peer LDP Identifier: 65.0.0.6:0
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls ldp neighbor
+Thu Oct 13 21:14:16.562 UTC
+
+Peer LDP Identifier: 65.0.0.2:0
+  TCP connection: 65.0.0.2:646 - 65.0.0.14:17377
+  Graceful Restart: No
+  Session Holdtime: 180 sec
+  State: Oper; Msgs sent/rcvd: 16132/16121; Downstream-Unsolicited
+  Up time: 1w2d
+  LDP Discovery Sources:
+    IPv4: (1)
+      GigabitEthernet0/0/0/0
+    IPv6: (0)
+  Addresses bound to this peer:
+    IPv4: (9)
+      65.0.0.2       165.1.2.2      165.2.3.1      165.2.4.1      
+      165.2.8.1      165.2.9.1      165.2.14.1     165.2.15.1     
+      165.2.16.1     
+    IPv6: (0)
+
+Peer LDP Identifier: 65.0.0.6:0
+  TCP connection: 65.0.0.6:646 - 65.0.0.14:47150
+  Graceful Restart: No
+  Session Holdtime: 180 sec
+  State: Oper; Msgs sent/rcvd: 16127/16117; Downstream-Unsolicited
+  Up time: 1w2d
+  LDP Discovery Sources:
+    IPv4: (1)
+      GigabitEthernet0/0/0/1
+    IPv6: (0)
+  Addresses bound to this peer:
+    IPv4: (9)
+      65.0.0.6       165.3.6.2      165.4.6.2      165.5.6.2      
+      165.6.10.1     165.6.11.1     165.6.14.1     165.6.15.1     
+      165.6.17.1     
+    IPv6: (0)
+
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls forwarding
+Thu Oct 13 21:14:27.572 UTC
+Local  Outgoing    Prefix             Outgoing     Next Hop        Bytes       
+Label  Label       or ID              Interface                    Switched    
+------ ----------- ------------------ ------------ --------------- ------------
+24000  24002       55.0.0.15/32       Gi0/0/0/0    165.2.14.1      0           
+       24002       55.0.0.15/32       Gi0/0/0/1    165.6.14.1      0           
+24001  14008       55.0.0.8/32        Gi0/0/0/2    175.14.14.2     58984       
+24002  14009       55.0.0.9/32        Gi0/0/0/2    175.14.14.2     22912       
+24003  14010       55.0.0.10/32       Gi0/0/0/2    175.14.14.2     30140       
+24004  14011       55.0.0.11/32       Gi0/0/0/2    175.14.14.2     14580       
+24005  14012       55.0.0.12/32       Gi0/0/0/2    175.14.14.2     33840       
+24006  14013       55.0.0.13/32       Gi0/0/0/2    175.14.14.2     12204       
+24007  14015       55.0.0.16/32       Gi0/0/0/2    175.14.14.2     0           
+24008  14016       55.0.0.17/32       Gi0/0/0/2    175.14.14.2     0           
+24009  Pop         55.0.0.14/32       Gi0/0/0/2    175.14.14.2     0           
+24010  14007       55.0.0.7/32        Gi0/0/0/2    175.14.14.2     474201      
+24012  Pop         175.14.14.2/32     Gi0/0/0/2    175.14.14.2     466503      
+24048  Pop         65.0.0.6/32        Gi0/0/0/1    165.6.14.1      1574716     
+24049  Pop         65.0.0.2/32        Gi0/0/0/0    165.2.14.1      1575014     
+24050  Pop         165.6.17.0/30      Gi0/0/0/1    165.6.14.1      0           
+24051  Pop         165.6.15.0/30      Gi0/0/0/1    165.6.14.1      0           
+24052  Pop         165.6.11.0/30      Gi0/0/0/1    165.6.14.1      0           
+24053  Pop         165.6.10.0/30      Gi0/0/0/1    165.6.14.1      0           
+24054  Pop         165.5.6.0/30       Gi0/0/0/1    165.6.14.1      0           
+24055  Pop         165.4.6.0/30       Gi0/0/0/1    165.6.14.1      0           
+24056  Pop         165.3.6.0/30       Gi0/0/0/1    165.6.14.1      0           
+24057  Pop         165.2.16.0/30      Gi0/0/0/0    165.2.14.1      0           
+24058  Pop         165.2.15.0/30      Gi0/0/0/0    165.2.14.1      0           
+24059  Pop         165.2.9.0/30       Gi0/0/0/0    165.2.14.1      0           
+24060  Pop         165.2.8.0/30       Gi0/0/0/0    165.2.14.1      0           
+24061  Pop         165.2.4.0/30       Gi0/0/0/0    165.2.14.1      0           
+24062  Pop         165.2.3.0/30       Gi0/0/0/0    165.2.14.1      0           
+24063  Pop         165.1.2.0/30       Gi0/0/0/0    165.2.14.1      0           
+24064  16200       65.0.0.1/32        Gi0/0/0/0    165.2.14.1      0           
+24065  16201       165.1.13.0/30      Gi0/0/0/0    165.2.14.1      0           
+24066  16202       165.1.12.0/30      Gi0/0/0/0    165.2.14.1      0           
+24067  16203       65.0.0.3/32        Gi0/0/0/0    165.2.14.1      0           
+       16602       65.0.0.3/32        Gi0/0/0/1    165.6.14.1      0           
+24068  16208       65.0.0.4/32        Gi0/0/0/0    165.2.14.1      0           
+       16601       65.0.0.4/32        Gi0/0/0/1    165.6.14.1      0           
+24069  16600       65.0.0.5/32        Gi0/0/0/1    165.6.14.1      0           
+24070  16219       65.0.0.8/32        Gi0/0/0/0    165.2.14.1      427964      
+24071  16221       65.0.0.9/32        Gi0/0/0/0    165.2.14.1      18954       
+24072  16619       65.0.0.11/32       Gi0/0/0/1    165.6.14.1      27836       
+24073  16218       65.0.0.7/32        Gi0/0/0/0    165.2.14.1      1176        
+       16618       65.0.0.7/32        Gi0/0/0/1    165.6.14.1      1901033     
+24074  16204       165.3.7.0/30       Gi0/0/0/0    165.2.14.1      0           
+       16609       165.3.7.0/30       Gi0/0/0/1    165.6.14.1      0           
+24075  16207       165.1.3.0/30       Gi0/0/0/0    165.2.14.1      0           
+       16613       165.1.3.0/30       Gi0/0/0/1    165.6.14.1      0           
+24076  16209       165.4.7.0/30       Gi0/0/0/0    165.2.14.1      0           
+       16605       165.4.7.0/30       Gi0/0/0/1    165.6.14.1      0           
+24077  16212       165.3.4.0/30       Gi0/0/0/0    165.2.14.1      0           
+       16611       165.3.4.0/30       Gi0/0/0/1    165.6.14.1      0           
+24078  16213       165.1.4.0/30       Gi0/0/0/0    165.2.14.1      0           
+       16608       165.1.4.0/30       Gi0/0/0/1    165.6.14.1      0           
+24079  16603       165.5.13.0/30      Gi0/0/0/1    165.6.14.1      0           
+24080  16604       165.5.12.0/30      Gi0/0/0/1    165.6.14.1      0           
+24081  16211       165.4.5.0/30       Gi0/0/0/0    165.2.14.1      0           
+       16606       165.4.5.0/30       Gi0/0/0/1    165.6.14.1      0           
+24082  16206       165.3.5.0/30       Gi0/0/0/0    165.2.14.1      0           
+       16610       165.3.5.0/30       Gi0/0/0/1    165.6.14.1      0           
+24083  16220       165.1.8.0/30       Gi0/0/0/0    165.2.14.1      0           
+24084  16222       165.1.9.0/30       Gi0/0/0/0    165.2.14.1      0           
+24085  16620       165.5.11.0/30      Gi0/0/0/1    165.6.14.1      0           
+24086  16225       65.0.0.16/32       Gi0/0/0/0    165.2.14.1      35052       
+24087  16226       165.1.16.0/30      Gi0/0/0/0    165.2.14.1      0           
+24088  16227       65.0.0.15/32       Gi0/0/0/0    165.2.14.1      0           
+       16623       65.0.0.15/32       Gi0/0/0/1    165.6.14.1      0           
+24089  16230       65.0.0.13/32       Gi0/0/0/0    165.2.14.1      60444       
+       16627       65.0.0.13/32       Gi0/0/0/1    165.6.14.1      32336       
+24090  16237       65.0.0.12/32       Gi0/0/0/0    165.2.14.1      120432      
+       16626       65.0.0.12/32       Gi0/0/0/1    165.6.14.1      137788      
+24091  16637       65.0.0.10/32       Gi0/0/0/1    165.6.14.1      306934      
+24092  16638       165.5.10.0/30      Gi0/0/0/1    165.6.14.1      0           
+24093  16639       65.0.0.17/32       Gi0/0/0/1    165.6.14.1      15180       
+24094  16640       165.5.17.0/30      Gi0/0/0/1    165.6.14.1      0           
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls ldp binding
+Thu Oct 13 21:14:43.461 UTC
+
+55.0.0.7/32, rev 184
+	Local binding: label: 24010
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24010   
+	    65.0.0.6:0          24010   
+55.0.0.8/32, rev 132
+	Local binding: label: 24001
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24008   
+	    65.0.0.6:0          24008   
+55.0.0.9/32, rev 133
+	Local binding: label: 24002
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24007   
+	    65.0.0.6:0          24007   
+55.0.0.10/32, rev 134
+	Local binding: label: 24003
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24006   
+	    65.0.0.6:0          24006   
+55.0.0.11/32, rev 135
+	Local binding: label: 24004
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24005   
+	    65.0.0.6:0          24005   
+55.0.0.12/32, rev 136
+	Local binding: label: 24005
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24004   
+	    65.0.0.6:0          24004   
+55.0.0.13/32, rev 137
+	Local binding: label: 24006
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24003   
+	    65.0.0.6:0          24003   
+55.0.0.14/32, rev 141
+	Local binding: label: 24009
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24009   
+	    65.0.0.6:0          24009   
+55.0.0.15/32, rev 143
+	Local binding: label: 24000
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24002   
+	    65.0.0.6:0          24002   
+55.0.0.16/32, rev 138
+	Local binding: label: 24007
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24001   
+	    65.0.0.6:0          24001   
+55.0.0.17/32, rev 139
+	Local binding: label: 24008
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          24000   
+	    65.0.0.6:0          24000   
+65.0.0.1/32, rev 70
+	Local binding: label: 24064
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16200   
+	    65.0.0.6:0          16614   
+65.0.0.2/32, rev 55
+	Local binding: label: 24049
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16625   
+65.0.0.3/32, rev 73
+	Local binding: label: 24067
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16203   
+	    65.0.0.6:0          16602   
+65.0.0.4/32, rev 74
+	Local binding: label: 24068
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16208   
+	    65.0.0.6:0          16601   
+65.0.0.5/32, rev 75
+	Local binding: label: 24069
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16214   
+	    65.0.0.6:0          16600   
+65.0.0.6/32, rev 54
+	Local binding: label: 24048
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16229   
+	    65.0.0.6:0          ImpNull 
+65.0.0.7/32, rev 79
+	Local binding: label: 24073
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16218   
+	    65.0.0.6:0          16618   
+65.0.0.8/32, rev 76
+	Local binding: label: 24070
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16219   
+	    65.0.0.6:0          16628   
+65.0.0.9/32, rev 77
+	Local binding: label: 24071
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16221   
+	    65.0.0.6:0          16629   
+65.0.0.10/32, rev 97
+	Local binding: label: 24091
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16239   
+	    65.0.0.6:0          16637   
+65.0.0.11/32, rev 78
+	Local binding: label: 24072
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16231   
+	    65.0.0.6:0          16619   
+65.0.0.12/32, rev 96
+	Local binding: label: 24090
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16237   
+	    65.0.0.6:0          16626   
+65.0.0.13/32, rev 95
+	Local binding: label: 24089
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16230   
+	    65.0.0.6:0          16627   
+65.0.0.14/32, rev 2
+	Local binding: label: ImpNull
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16223   
+	    65.0.0.6:0          16621   
+65.0.0.15/32, rev 94
+	Local binding: label: 24088
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16227   
+	    65.0.0.6:0          16623   
+65.0.0.16/32, rev 92
+	Local binding: label: 24086
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16225   
+	    65.0.0.6:0          16630   
+65.0.0.17/32, rev 99
+	Local binding: label: 24093
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16240   
+	    65.0.0.6:0          16639   
+165.1.2.0/30, rev 69
+	Local binding: label: 24063
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16634   
+165.1.3.0/30, rev 81
+	Local binding: label: 24075
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16207   
+	    65.0.0.6:0          16613   
+165.1.4.0/30, rev 84
+	Local binding: label: 24078
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16213   
+	    65.0.0.6:0          16608   
+165.1.8.0/30, rev 89
+	Local binding: label: 24083
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16220   
+	    65.0.0.6:0          16617   
+165.1.9.0/30, rev 90
+	Local binding: label: 24084
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16222   
+	    65.0.0.6:0          16616   
+165.1.12.0/30, rev 72
+	Local binding: label: 24066
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16202   
+	    65.0.0.6:0          16635   
+165.1.13.0/30, rev 71
+	Local binding: label: 24065
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16201   
+	    65.0.0.6:0          16636   
+165.1.16.0/30, rev 93
+	Local binding: label: 24087
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16226   
+	    65.0.0.6:0          16615   
+165.2.3.0/30, rev 68
+	Local binding: label: 24062
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16612   
+165.2.4.0/30, rev 67
+	Local binding: label: 24061
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16607   
+165.2.8.0/30, rev 66
+	Local binding: label: 24060
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16633   
+165.2.9.0/30, rev 65
+	Local binding: label: 24059
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16632   
+165.2.14.0/30, rev 4
+	Local binding: label: ImpNull
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16622   
+165.2.15.0/30, rev 64
+	Local binding: label: 24058
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16624   
+165.2.16.0/30, rev 63
+	Local binding: label: 24057
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          ImpNull 
+	    65.0.0.6:0          16631   
+165.3.4.0/30, rev 83
+	Local binding: label: 24077
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16212   
+	    65.0.0.6:0          16611   
+165.3.5.0/30, rev 88
+	Local binding: label: 24082
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16206   
+	    65.0.0.6:0          16610   
+165.3.6.0/30, rev 62
+	Local binding: label: 24056
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16205   
+	    65.0.0.6:0          ImpNull 
+165.3.7.0/30, rev 80
+	Local binding: label: 24074
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16204   
+	    65.0.0.6:0          16609   
+165.4.5.0/30, rev 87
+	Local binding: label: 24081
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16211   
+	    65.0.0.6:0          16606   
+165.4.6.0/30, rev 61
+	Local binding: label: 24055
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16210   
+	    65.0.0.6:0          ImpNull 
+165.4.7.0/30, rev 82
+	Local binding: label: 24076
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16209   
+	    65.0.0.6:0          16605   
+165.5.6.0/30, rev 60
+	Local binding: label: 24054
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16235   
+	    65.0.0.6:0          ImpNull 
+165.5.10.0/30, rev 98
+	Local binding: label: 24092
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16217   
+	    65.0.0.6:0          16638   
+165.5.11.0/30, rev 91
+	Local binding: label: 24085
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16216   
+	    65.0.0.6:0          16620   
+165.5.12.0/30, rev 86
+	Local binding: label: 24080
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16238   
+	    65.0.0.6:0          16604   
+165.5.13.0/30, rev 85
+	Local binding: label: 24079
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16236   
+	    65.0.0.6:0          16603   
+165.5.17.0/30, rev 100
+	Local binding: label: 24094
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16215   
+	    65.0.0.6:0          16640   
+165.6.10.0/30, rev 59
+	Local binding: label: 24053
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16234   
+	    65.0.0.6:0          ImpNull 
+165.6.11.0/30, rev 58
+	Local binding: label: 24052
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16233   
+	    65.0.0.6:0          ImpNull 
+165.6.14.0/30, rev 6
+	Local binding: label: ImpNull
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16224   
+	    65.0.0.6:0          ImpNull 
+165.6.15.0/30, rev 57
+	Local binding: label: 24051
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16228   
+	    65.0.0.6:0          ImpNull 
+165.6.17.0/30, rev 56
+	Local binding: label: 24050
+	Remote bindings: (2 peers)
+	    Peer                Label    
+	    -----------------   ---------
+	    65.0.0.2:0          16232   
+	    65.0.0.6:0          ImpNull 
+175.14.14.0/30, rev 102
+	Local binding: label: ImpNull
+	No remote bindings
+175.14.14.2/32, rev 112
+	Local binding: label: 24012
+	No remote bindings
+
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show vrf all
+Thu Oct 13 21:14:57.490 UTC
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show vrf all detai;
+                                    ^
+% Invalid input detected at '^' marker.
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show vrf all detail
+Thu Oct 13 21:15:05.079 UTC
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vpnv4 unicast summary
+Thu Oct 13 21:15:15.418 UTC
+BGP router identifier 65.0.0.14, local AS number 2000
+BGP generic scan interval 60 secs
+Non-stop routing is enabled
+BGP table state: Active
+Table ID: 0x0   RD version: 0
+BGP main routing table version 11735
+BGP NSR Initial initsync version 1 (Reached)
+BGP NSR/ISSU Sync-Group versions 0/0
+BGP scan interval 60 secs
+
+BGP is operating in STANDALONE mode.
+
+
+Process       RcvTblVer   bRIB/RIB   LabelVer  ImportVer  SendTblVer  StandbyVer
+Speaker           11735      11735      11735      11735       11735           0
+
+Neighbor        Spk    AS MsgRcvd MsgSent   TblVer  InQ OutQ  Up/Down  St/PfxRcd
+65.0.0.7          0  2000   16818   15148    11735    0    0     1w2d          0
+
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vpnv4 unicast 
+Thu Oct 13 21:15:22.728 UTC
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vrf A summary
+Thu Oct 13 21:15:43.056 UTC
+% None of the requested address families are configured for instance 'default'(26736)
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vrf A 
+Thu Oct 13 21:15:48.366 UTC
+% None of the requested address families are configured for instance 'default'(26736)
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vrf B summary
+Thu Oct 13 21:15:56.246 UTC
+% None of the requested address families are configured for instance 'default'(26736)
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vrf B 
+Thu Oct 13 21:16:01.165 UTC
+% None of the requested address families are configured for instance 'default'(26736)
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vrf C summary
+Thu Oct 13 21:16:09.285 UTC
+% None of the requested address families are configured for instance 'default'(26736)
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vrf C 
+Thu Oct 13 21:16:13.584 UTC
+% None of the requested address families are configured for instance 'default'(26736)
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show bgp vpnv4 unicast labels
+Thu Oct 13 21:16:19.934 UTC
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls label range
+Thu Oct 13 21:16:31.603 UTC
+Range for dynamic labels: Min/Max: 24000/1048575
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls interface
+Thu Oct 13 21:16:38.313 UTC
+Interface                  LDP      Tunnel   Static   Enabled 
+-------------------------- -------- -------- -------- --------
+GigabitEthernet0/0/0/0     Yes      No       No       Yes
+GigabitEthernet0/0/0/1     Yes      No       No       Yes
+GigabitEthernet0/0/0/2     No       No       No       Yes
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show mpls interface detail
+Thu Oct 13 21:16:46.102 UTC
+Interface GigabitEthernet0/0/0/0:
+        LDP labelling enabled
+        LSP labelling not enabled
+        MPLS enabled
+Interface GigabitEthernet0/0/0/1:
+        LDP labelling enabled
+        LSP labelling not enabled
+        MPLS enabled
+Interface GigabitEthernet0/0/0/2:
+        LDP labelling not enabled
+        LSP labelling not enabled
+        MPLS BGP-VPNv4 enabled
+        MPLS enabled
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#show rpl
+Thu Oct 13 21:17:07.111 UTC
+prefix-set AS1000_PEs
+  55.0.0.8/32,
+  55.0.0.9/32,
+  55.0.0.10/32,
+  55.0.0.11/32,
+  55.0.0.12/32,
+  55.0.0.13/32,
+  55.0.0.14/32,
+  55.0.0.16/32,
+  55.0.0.17/32
+end-set
+!
+as-path-set 101
+  ios-regex '_2033$',
+  ios-regex '_2035$',
+  ios-regex '_2037$',
+  ios-regex '_2039$',
+  ios-regex '_2041$',
+  ios-regex '_2043$'
+end-set
+!
+as-path-set 102
+  ios-regex '_2032$',
+  ios-regex '_2034$',
+  ios-regex '_2036$',
+  ios-regex '_2038$',
+  ios-regex '_2040$',
+  ios-regex '_2042$',
+  ios-regex '_2044$'
+end-set
+!
+as-path-set INET_AS2018
+  ios-regex '_2018$'
+end-set
+!
+as-path-set INET_AS2019
+  ios-regex '_2019$'
+end-set
+!
+route-policy IN
+  pass
+end-policy
+!
+route-policy OUT
+  pass
+end-policy
+!
+route-policy PASS
+  pass
+end-policy
+!
+route-policy AS1000_PEs
+  if source-prefix in AS1000_PEs then
+    pass
+  endif
+end-policy
+!
+
+RP/0/0/CPU0:XRV14#
+RP/0/0/CPU0:XRV14#

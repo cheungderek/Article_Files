@@ -1,0 +1,347 @@
+
+A:R7# admin display-config
+# TiMOS-B-13.0.R1 both/i386 ALCATEL SR 7750 Copyright (c) 2000-2015 Alcatel-Lucent.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Fri Feb 27 21:10:57 PST 2015 by builder in /rel13.0/b1/R1/panos/main
+
+# Generated THU FEB 23 14:39:25 2017 UTC
+
+exit all
+configure
+#--------------------------------------------------
+echo "System Configuration"
+#--------------------------------------------------
+    system
+        name "R7"
+        chassis-mode d
+        dns
+        exit
+        rollback
+            rollback-location "cf3:gns3_interop.cfg"
+        exit
+        snmp
+            streaming
+                no shutdown
+            exit
+            shutdown
+            packet-size 9216
+        exit
+        time
+            sntp
+                server-address 138.203.180.3
+                no shutdown
+            exit
+            dst-zone CEST
+                start last sunday march 02:00
+                end last sunday october 02:00
+            exit
+            zone CEST 01
+        exit
+        thresholds
+            rmon
+            exit
+        exit
+    exit
+#--------------------------------------------------
+echo "System Security Configuration"
+#--------------------------------------------------
+    system
+        security
+            telnet-server
+            password
+                attempts 7 time 1 lockout 1
+            exit
+            snmp
+            exit
+            ssh
+                preserve-key
+                version 1-2
+            exit
+            no per-peer-queuing
+            cpu-protection
+                link-specific-rate max
+                policy 254 create
+                exit
+                policy 255 create
+                exit
+                port-overall-rate 15000
+            exit
+        exit
+    exit
+#--------------------------------------------------
+echo "System Login Control Configuration"
+#--------------------------------------------------
+    system
+        login-control
+            ssh
+                inbound-max-sessions 15
+            exit
+            telnet
+                inbound-max-sessions 15
+            exit
+            idle-timeout disable
+            pre-login-message "\n\n\n        R7 (7750) \n\n"
+        exit
+    exit
+#--------------------------------------------------
+echo "Log Configuration"
+#--------------------------------------------------
+    log
+        event-control "igmp" 2005 suppress
+        event-control "video" 2009 suppress
+        event-control "video" 2010 suppress
+        event-control "vrtr" 2034 generate
+        snmp-trap-group 98
+            description "5620sam"
+            trap-target "ECB1D7406630:main1" address 172.31.78.44 snmpv2c notify-community "privatetrap98"
+            trap-target "ECB1D7406630:main2" address 172.31.78.45 snmpv2c notify-community "privatetrap98"
+            trap-target "ECB1D74297A0:main1" address 172.31.78.43 snmpv2c notify-community "privatetrap98"
+        exit
+        log-id 7
+            from debug-trace
+            no shutdown
+        exit
+        log-id 98
+            from main security change
+            to snmp 1024
+            no shutdown
+        exit
+    exit
+#--------------------------------------------------
+echo "System Security Cpm Hw Filters and PKI Configuration"
+#--------------------------------------------------
+    system
+        security
+        exit
+    exit
+#--------------------------------------------------
+echo "QoS Policy Configuration"
+#--------------------------------------------------
+    qos
+    exit
+#--------------------------------------------------
+echo "Card Configuration"
+#--------------------------------------------------
+    card 1
+        card-type iom3-xp-b
+        mda 1
+            mda-type m10-1gb-xp-sfp
+            no shutdown
+        exit
+        no shutdown
+    exit
+#--------------------------------------------------
+echo "Port Configuration"
+#--------------------------------------------------
+    port 1/1/1
+        ethernet
+            mtu 1540
+        exit
+        no shutdown
+    exit
+    port 1/1/2
+        ethernet
+            mtu 1514
+        exit
+        no shutdown
+    exit
+    port 1/1/3
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/4
+        ethernet
+            mode access
+            lldp
+                dest-mac nearest-bridge
+                    admin-status tx-rx
+                    notification
+                exit
+            exit
+        exit
+        no shutdown
+    exit
+    port 1/1/5
+        ethernet
+            mode access
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/6
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/7
+        ethernet
+            mode access
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/8
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/9
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/10
+        shutdown
+        ethernet
+        exit
+    exit
+#--------------------------------------------------
+echo "System Sync-If-Timing Configuration"
+#--------------------------------------------------
+    system
+        sync-if-timing
+            begin
+            commit
+        exit
+    exit
+#--------------------------------------------------
+echo "Management Router Configuration"
+#--------------------------------------------------
+    router management
+    exit
+
+#--------------------------------------------------
+echo "Router (Network Side) Configuration"
+#--------------------------------------------------
+    router
+        interface "system"
+            address 10.10.100.7/32
+            no shutdown
+        exit
+        interface "to_Cisco7200"
+            address 10.7.9.7/24
+            port 1/1/1
+            no shutdown
+        exit
+        autonomous-system 65501
+#--------------------------------------------------
+echo "OSPFv2 Configuration"
+#--------------------------------------------------
+        ospf
+            traffic-engineering
+            area 0.0.0.0
+                interface "system"
+                    no shutdown
+                exit
+                interface "to_Cisco7200"
+                    interface-type point-to-point
+                    no shutdown
+                exit
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "MPLS Configuration"
+#--------------------------------------------------
+        mpls
+            interface "system"
+                no shutdown
+            exit
+            interface "to_Cisco7200"
+                no shutdown
+            exit
+        exit
+#--------------------------------------------------
+echo "RSVP Configuration"
+#--------------------------------------------------
+        rsvp
+            interface "system"
+                no shutdown
+            exit
+            interface "to_Cisco7200"
+                no shutdown
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "MPLS LSP Configuration"
+#--------------------------------------------------
+        mpls
+            path "loose"
+                no shutdown
+            exit
+            lsp "lsp_Cisco7200"
+                to 10.10.100.9
+                primary "loose"
+                exit
+                no shutdown
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "LDP Configuration"
+#--------------------------------------------------
+        ldp
+            interface-parameters
+                interface "to_Cisco7200" dual-stack
+                    ipv4
+                        no shutdown
+                    exit
+                    no shutdown
+                exit
+            exit
+            targeted-session
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "Web Portal Protocol Configuration"
+#--------------------------------------------------
+    exit
+
+#--------------------------------------------------
+echo "Service Configuration"
+#--------------------------------------------------
+    service
+        sdp 9 mpls create
+            far-end 10.10.100.9
+            lsp "lsp_Cisco7200"
+            keep-alive
+                shutdown
+            exit
+            no shutdown
+        exit
+        customer 1 create
+            description "Default customer"
+        exit
+        epipe 10 customer 1 create
+            sap 1/1/4 create
+            exit
+            spoke-sdp 9:10 create
+                no shutdown
+            exit
+            no shutdown
+        exit
+    exit
+#--------------------------------------------------
+echo "Router (Service Side) Configuration"
+#--------------------------------------------------
+    router
+#--------------------------------------------------
+echo "OSPFv2 Configuration"
+#--------------------------------------------------
+        ospf
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "WLAN Gateway Configuration"
+#--------------------------------------------------
+    exit
+
+
+exit all
+
+# Finished THU FEB 23 14:39:28 2017 UTC
+A:R7#

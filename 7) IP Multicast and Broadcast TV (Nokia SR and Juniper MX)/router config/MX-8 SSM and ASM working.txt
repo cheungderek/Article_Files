@@ -1,0 +1,144 @@
+root@MX-8> show configuration 
+## Last commit: 2017-09-01 21:37:18 UTC by root
+version 14.1R1.10;
+groups {
+    global {
+        system {
+            root-authentication {
+                encrypted-password "$1$UQ8Nx0vE$nlu5Nf59u7Etpxpaslx7w."; ## SECRET-DATA
+            }
+        }
+    }
+}
+system {
+    host-name MX-8;
+    root-authentication {
+        encrypted-password "$1$9lxY/rAW$Ylt9So1.9X623Aybiyz711"; ## SECRET-DATA
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;         
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        description "to IP Core Network via SR-4";
+        unit 0 {
+            family inet {
+                address 10.4.8.8/27;
+            }
+            family iso;
+            family mpls;
+        }
+    }
+    ge-0/0/2 {
+        description "to OLT8";
+        unit 0 {
+            family inet {
+                address 192.168.88.1/24;
+            }                           
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.10.100.8/32;
+            }
+            family iso {
+                address 49.0026.0000.0000.00;
+            }
+            family mpls;
+        }
+    }
+}
+routing-options {
+    multicast {
+        ssm-groups [ 232.0.0.0/8 239.0.0.0/8 ];
+        asm-override-ssm;
+        ssm-map ssm_232 {
+            policy ssm_policy_232;
+            source 192.168.55.2;
+        }
+    }                                   
+}
+protocols {
+    igmp {
+        interface ge-0/0/2.0 {
+            version 3;
+            ssm-map ssm_232;
+        }
+    }
+    rsvp {
+        interface ge-0/0/0.0;
+    }
+    mpls {
+        label-switched-path r8-r5 {
+            to 10.10.100.5;
+        }
+        label-switched-path r8-r6 {
+            to 10.10.100.6;
+        }
+        interface ge-0/0/0.0;
+    }
+    isis {
+        reference-bandwidth 100g;
+        level 1 disable;                
+        level 2 {
+            authentication-key "$9$6PdPAORcyK8LN"; ## SECRET-DATA
+            authentication-type md5;
+            wide-metrics-only;
+        }
+        interface ge-0/0/0.0 {
+            point-to-point;
+        }
+        interface ge-0/0/2.0 {
+            passive;
+        }
+        interface lo0.0;
+    }
+    ldp {
+        interface lo0.0;
+    }
+    pim {
+        rp {
+            static {
+                address 10.10.100.3 {
+                    group-ranges {
+                        224.0.0.0/8;
+                    }                   
+                }
+            }
+        }
+        interface ge-0/0/0.0 {
+            mode sparse;
+        }
+        interface lo0.0 {
+            mode sparse;
+        }
+    }
+}
+policy-options {
+    policy-statement ssm_policy_232 {
+        term 10 {
+            from {
+                route-filter 232.0.0.0/8 longer;
+            }
+            then accept;
+        }
+        term 20 {
+            from {
+                route-filter 224.0.0.0/8 longer;
+            }                           
+            then accept;
+        }
+        then reject;
+    }
+}

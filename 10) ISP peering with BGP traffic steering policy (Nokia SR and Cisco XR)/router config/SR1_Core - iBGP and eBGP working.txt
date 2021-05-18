@@ -1,0 +1,490 @@
+A:SR1_Core# admin display-config 
+# TiMOS-B-15.0.R1 both/x86_64 Nokia 7750 SR Copyright (c) 2000-2017 Nokia.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Tue Mar 7 09:53:27 PST 2017 by builder in /builds/rel15.0/150B/R1/panos/main
+
+# Generated THU JAN 04 02:00:46 2018 UTC
+
+exit all
+configure
+#--------------------------------------------------
+echo "System Configuration"
+#--------------------------------------------------
+    system
+        name "SR1_Core"
+        snmp
+            shutdown
+        exit
+        time
+            sntp
+                shutdown
+            exit
+            zone UTC 
+        exit
+    exit                              
+#--------------------------------------------------
+echo "System Security Configuration"
+#--------------------------------------------------
+    system
+        security
+            no per-peer-queuing
+            cpu-protection
+                link-specific-rate max
+                policy 254 create
+                exit
+                policy 255 create
+                exit
+                port-overall-rate 15000 
+            exit
+            dist-cpu-protection
+                policy "_default-access-policy" create
+                exit
+                policy "_default-network-policy" create
+                exit
+            exit
+        exit
+    exit
+#--------------------------------------------------
+echo "System Login Control Configuration"
+#--------------------------------------------------
+    system
+        login-control
+            idle-timeout disable
+        exit
+    exit
+#--------------------------------------------------
+echo "Log Configuration"
+#--------------------------------------------------
+    log 
+    exit 
+#--------------------------------------------------
+echo "Card Configuration"
+#--------------------------------------------------
+    card 1
+        card-type iom3-xp-c
+        mda 1
+            mda-type m60-10/100eth-tx
+            no shutdown
+        exit
+        mda 2
+            shutdown                  
+            mda-type isa-bb
+        exit
+        no shutdown
+    exit
+#--------------------------------------------------
+echo "Port Configuration"
+#--------------------------------------------------
+    port 1/1/1
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/2
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/3
+        ethernet
+            mtu 9212
+        exit                          
+        no shutdown
+    exit
+    port 1/1/4
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/5
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/6
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/7
+        shutdown
+        ethernet
+        exit                          
+    exit
+    port 1/1/8
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/9
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/10
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/11
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/12
+        shutdown                      
+        ethernet
+        exit
+    exit
+    port 1/1/13
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/14
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/15
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/16
+        shutdown
+        ethernet
+        exit
+    exit                              
+    port 1/1/17
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/18
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/19
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/20
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/21
+        shutdown
+        ethernet                      
+        exit
+    exit
+    port 1/1/22
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/23
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/24
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/25
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/26                       
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/27
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/28
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/29
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/30
+        shutdown
+        ethernet
+        exit                          
+    exit
+    port 1/1/31
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/32
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/33
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/34
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/35
+        shutdown                      
+        ethernet
+        exit
+    exit
+    port 1/1/36
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/37
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/38
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/39
+        shutdown
+        ethernet
+        exit
+    exit                              
+    port 1/1/40
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/41
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/42
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/43
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/44
+        shutdown
+        ethernet                      
+        exit
+    exit
+    port 1/1/45
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/46
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/47
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/48
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/49                       
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/50
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/51
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/52
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/53
+        shutdown
+        ethernet
+        exit                          
+    exit
+    port 1/1/54
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/55
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/56
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/57
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/58
+        shutdown                      
+        ethernet
+        exit
+    exit
+    port 1/1/59
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/60
+        shutdown
+        ethernet
+        exit
+    exit
+#--------------------------------------------------
+echo "System Sync-If-Timing Configuration"
+#--------------------------------------------------
+    system
+        sync-if-timing
+            begin
+            commit
+        exit
+    exit
+#--------------------------------------------------
+echo "Management Router Configuration"
+#--------------------------------------------------
+    router management
+    exit
+
+#--------------------------------------------------
+echo "Router (Network Side) Configuration"
+#--------------------------------------------------
+    router Base
+        interface "system"
+            address 10.10.100.1/32
+            no shutdown
+        exit
+        interface "toSR2_Core"
+            address 10.1.2.1/27
+            port 1/1/1
+            no shutdown
+        exit
+        interface "toSR5_Edge"
+            address 10.1.5.1/27
+            port 1/1/2
+            no shutdown
+        exit                          
+        interface "toXR3_Cisco"
+            address 10.1.3.1/27
+            port 1/1/3
+            no shutdown
+        exit
+        autonomous-system 65100
+#--------------------------------------------------
+echo "OSPFv2 Configuration"
+#--------------------------------------------------
+        ospf 0
+            area 0.0.0.0
+                interface "system"
+                    no shutdown
+                exit
+                interface "toSR5_Edge"
+                    no shutdown
+                exit
+                interface "toSR2_Core"
+                    no shutdown
+                exit
+            exit
+            no shutdown
+        exit                          
+#--------------------------------------------------
+echo "Web Portal Protocol Configuration"
+#--------------------------------------------------
+    exit
+
+#--------------------------------------------------
+echo "Service Configuration"
+#--------------------------------------------------
+    service
+        customer 1 create
+            description "Default customer"
+        exit
+    exit
+#--------------------------------------------------
+echo "Router (Service Side) Configuration"
+#--------------------------------------------------
+    router Base
+#--------------------------------------------------
+echo "OSPFv2 Configuration"
+#--------------------------------------------------
+        ospf 0
+            no shutdown
+        exit                          
+#--------------------------------------------------
+echo "BGP Configuration"
+#--------------------------------------------------
+        bgp
+            group "iBGP"
+                next-hop-self
+                type internal
+                peer-as 65100
+                neighbor 10.10.100.2
+                exit
+                neighbor 10.10.100.5
+                    cluster 10.10.100.1
+                exit
+                neighbor 10.10.100.6
+                    cluster 10.10.100.1
+                exit
+            exit
+            group "eBPG_AS65200"
+                type external
+                peer-as 65200
+                neighbor 10.1.3.3
+                exit
+            exit                      
+            no shutdown
+        exit
+    exit
+
+
+exit all

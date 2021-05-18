@@ -1,0 +1,145 @@
+root@MX4_RBR> show configuration 
+## Last commit: 2017-11-20 00:42:16 UTC by root
+version 14.1R1.10;
+system {
+    host-name MX4_RBR;
+    default-address-selection;
+    root-authentication {
+        encrypted-password "$1$6crUcDLg$A7iwytkWp009KpKrk883Q/"; ## SECRET-DATA
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        description "to SR1_Core. Map to GNS3's eth2";
+        mtu 2000;
+        unit 0 {
+            family inet {
+                address 10.1.4.4/27;
+            }
+            family iso;
+            family mpls;
+        }
+    }
+    ge-0/0/1 {
+        description "to MX6_Access. Map to GNS3's eth3";
+        unit 0 {
+            family inet {
+                address 10.4.6.4/27;
+            }
+            family iso;
+            family mpls;
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.10.100.4/32; 
+            }
+            family iso {
+                address 49.0001.0000.0000.00;
+                address 49.0002.0000.0000.00;
+            }
+        }
+    }
+}
+routing-options {
+    router-id 10.10.100.4;
+    autonomous-system 65100;
+}
+protocols {
+    mpls {
+        interface ge-0/0/0.0;
+        interface ge-0/0/1.0;
+    }
+    bgp {
+        group iBGP_Core {
+            type internal;
+            local-address 10.10.100.4;
+            advertise-inactive;
+            family inet {               
+                labeled-unicast;
+            }
+            family inet-vpn {
+                unicast;
+            }
+            export [ advertise.lo0 next-hop-self-all ];
+            neighbor 10.10.100.1;
+        }
+        group iBGP_Access {
+            type internal;
+            local-address 10.10.100.4;
+            advertise-inactive;
+            family inet {
+                labeled-unicast;
+            }
+            family inet-vpn {
+                unicast;
+            }
+            family l2vpn {
+                signaling;
+            }
+            export [ advertise.lo0 next-hop-self-all ];
+            cluster 4.4.4.4;            
+            neighbor 10.10.100.6;
+        }
+    }
+    isis {
+        interface ge-0/0/0.0 {
+            point-to-point;
+            level 1 disable;
+        }
+        interface ge-0/0/1.0 {
+            point-to-point;
+            level 2 disable;
+        }
+        interface lo0.0 {
+            level 1 passive;
+            level 2 passive;
+        }
+    }
+    ldp {
+        interface ge-0/0/0.0;
+        interface ge-0/0/1.0;
+        interface lo0.0;
+    }
+}                                       
+policy-options {
+    policy-statement advertise.lo0 {
+        term self {
+            from {
+                protocol direct;
+                route-filter 0.0.0.0/0 prefix-length-range /32-/32;
+            }
+            then accept;
+        }
+        from rib inet.3;
+    }
+    policy-statement next-hop-self-all {
+        term 1 {
+            then {
+                next-hop self;
+            }
+        }
+    }
+    policy-statement reject-L1-into-L2 {
+        term 1 {
+            from {
+                protocol isis;
+                level 1;                
+            }
+            then reject;
+        }
+    }
+}

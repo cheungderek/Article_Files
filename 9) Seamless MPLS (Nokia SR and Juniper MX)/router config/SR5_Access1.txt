@@ -1,0 +1,588 @@
+A:SR5_Access# admin display-config 
+# TiMOS-B-15.0.R1 both/x86_64 Nokia 7750 SR Copyright (c) 2000-2017 Nokia.
+# All rights reserved. All use subject to applicable license agreements.
+# Built on Tue Mar 7 09:53:27 PST 2017 by builder in /builds/rel15.0/150B/R1/panos/main
+
+# Generated TUE NOV 21 03:34:03 2017 UTC
+
+exit all
+configure
+#--------------------------------------------------
+echo "System Configuration"
+#--------------------------------------------------
+    system
+        name "SR5_Access"
+        rollback
+            rollback-location "cf3:\rollbacks\config-SR5.cfg"
+        exit
+        snmp
+            shutdown
+        exit
+        time
+            sntp
+                shutdown
+            exit                      
+            zone UTC 
+        exit
+    exit
+#--------------------------------------------------
+echo "System Security Configuration"
+#--------------------------------------------------
+    system
+        security
+            no per-peer-queuing
+            cpu-protection
+                link-specific-rate max
+                policy 254 create
+                exit
+                policy 255 create
+                exit
+                port-overall-rate 15000 
+            exit
+            dist-cpu-protection
+                policy "_default-access-policy" create
+                exit
+                policy "_default-network-policy" create
+                exit
+            exit                      
+        exit
+    exit
+#--------------------------------------------------
+echo "System Login Control Configuration"
+#--------------------------------------------------
+    system
+        login-control
+            idle-timeout disable
+        exit
+    exit
+#--------------------------------------------------
+echo "Log Configuration"
+#--------------------------------------------------
+    log 
+    exit 
+#--------------------------------------------------
+echo "Card Configuration"
+#--------------------------------------------------
+    card 1
+        card-type iom3-xp-c
+        mda 1
+            mda-type m60-10/100eth-tx
+            no shutdown               
+        exit
+        no shutdown
+    exit
+#--------------------------------------------------
+echo "Port Configuration"
+#--------------------------------------------------
+    port 1/1/1
+        ethernet
+            mtu 9212
+        exit
+        no shutdown
+    exit
+    port 1/1/2
+        ethernet
+        exit
+        no shutdown
+    exit
+    port 1/1/3
+        ethernet
+        exit
+        no shutdown
+    exit
+    port 1/1/4                        
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/5
+        ethernet
+            mode access
+        exit
+        no shutdown
+    exit
+    port 1/1/6
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/7
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/8
+        shutdown
+        ethernet                      
+        exit
+    exit
+    port 1/1/9
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/10
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/11
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/12
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/13                       
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/14
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/15
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/16
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/17
+        shutdown
+        ethernet
+        exit                          
+    exit
+    port 1/1/18
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/19
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/20
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/21
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/22
+        shutdown                      
+        ethernet
+        exit
+    exit
+    port 1/1/23
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/24
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/25
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/26
+        shutdown
+        ethernet
+        exit
+    exit                              
+    port 1/1/27
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/28
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/29
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/30
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/31
+        shutdown
+        ethernet                      
+        exit
+    exit
+    port 1/1/32
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/33
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/34
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/35
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/36                       
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/37
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/38
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/39
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/40
+        shutdown
+        ethernet
+        exit                          
+    exit
+    port 1/1/41
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/42
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/43
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/44
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/45
+        shutdown                      
+        ethernet
+        exit
+    exit
+    port 1/1/46
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/47
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/48
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/49
+        shutdown
+        ethernet
+        exit
+    exit                              
+    port 1/1/50
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/51
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/52
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/53
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/54
+        shutdown
+        ethernet                      
+        exit
+    exit
+    port 1/1/55
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/56
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/57
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/58
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/59                       
+        shutdown
+        ethernet
+        exit
+    exit
+    port 1/1/60
+        shutdown
+        ethernet
+        exit
+    exit
+#--------------------------------------------------
+echo "System Sync-If-Timing Configuration"
+#--------------------------------------------------
+    system
+        sync-if-timing
+            begin
+            commit
+        exit
+    exit
+#--------------------------------------------------
+echo "Management Router Configuration"
+#--------------------------------------------------
+    router management
+    exit                              
+
+#--------------------------------------------------
+echo "Router (Network Side) Configuration"
+#--------------------------------------------------
+    router Base
+        interface "system"
+            address 10.10.100.5/32
+            no shutdown
+        exit
+        interface "to_SR3_PE"
+            address 10.3.5.5/27
+            port 1/1/1
+            no shutdown
+        exit
+        autonomous-system 65100
+#--------------------------------------------------
+echo "OSPFv2 Configuration"
+#--------------------------------------------------
+        ospf 0
+            shutdown
+            area 0.0.0.1
+                stub
+                exit                  
+                interface "system"
+                    no shutdown
+                exit
+                interface "to_SR3_PE"
+                    no shutdown
+                exit
+            exit
+        exit
+#--------------------------------------------------
+echo "ISIS Configuration"
+#--------------------------------------------------
+        isis 0
+            shutdown
+        exit
+#--------------------------------------------------
+echo "ISIS (Inst: 1) Configuration"
+#--------------------------------------------------
+        isis 1
+            level-capability level-2
+            interface "system"
+                no shutdown
+            exit
+            interface "to_SR3_PE"     
+                interface-type point-to-point
+                no shutdown
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "ISIS (Inst: 2) Configuration"
+#--------------------------------------------------
+        isis 2
+            shutdown
+        exit
+#--------------------------------------------------
+echo "LDP Configuration"
+#--------------------------------------------------
+        ldp
+            interface-parameters
+                interface "to_SR3_PE" dual-stack
+                    ipv4
+                        no shutdown
+                    exit
+                    no shutdown
+                exit
+            exit                      
+            targeted-session
+                peer 10.10.100.6
+                    no shutdown
+                exit
+                peer 10.10.100.9
+                    no shutdown
+                exit
+            exit
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "Web Portal Protocol Configuration"
+#--------------------------------------------------
+    exit
+
+#--------------------------------------------------
+echo "Service Configuration"
+#--------------------------------------------------
+    service
+        sdp 6 mpls create
+            far-end 10.10.100.6
+            bgp-tunnel
+            keep-alive                
+                shutdown
+            exit
+            no shutdown
+        exit
+        sdp 9 mpls create
+            far-end 10.10.100.9
+            bgp-tunnel
+            keep-alive
+                shutdown
+            exit
+            no shutdown
+        exit
+        customer 1 create
+            description "Default customer"
+        exit
+        epipe 10 customer 1 create
+            spoke-sdp 6:10 create
+                no shutdown
+            exit
+            no shutdown
+        exit
+        vpls 400 customer 1 create
+            stp                       
+                shutdown
+            exit
+            sap 1/1/5 create
+                no shutdown
+            exit
+            mesh-sdp 6:400 create
+                no shutdown
+            exit
+            mesh-sdp 9:400 create
+                no shutdown
+            exit
+            no shutdown
+        exit
+    exit
+#--------------------------------------------------
+echo "Router (Service Side) Configuration"
+#--------------------------------------------------
+    router Base
+#--------------------------------------------------
+echo "OSPFv2 Configuration"
+#--------------------------------------------------
+        ospf 0
+            shutdown                  
+        exit
+#--------------------------------------------------
+echo "ISIS Configuration"
+#--------------------------------------------------
+        isis 0
+        exit
+#--------------------------------------------------
+echo "ISIS (Inst: 1) Configuration"
+#--------------------------------------------------
+        isis 1
+            no shutdown
+        exit
+#--------------------------------------------------
+echo "ISIS (Inst: 2) Configuration"
+#--------------------------------------------------
+        isis 2
+        exit
+#--------------------------------------------------
+echo "Policy Configuration"
+#--------------------------------------------------
+        policy-options
+            begin
+            prefix-list "system"      
+                prefix 10.10.100.5/32 exact
+            exit
+            policy-statement "export-system"
+                entry 10
+                    from
+                        protocol direct
+                        prefix-list "system"
+                    exit
+                    action accept
+                    exit
+                exit
+            exit
+            commit
+        exit
+#--------------------------------------------------
+echo "BGP Configuration"
+#--------------------------------------------------
+        bgp
+            group "iBGP_RBR"
+                family vpn-ipv4 label-ipv4
+                type internal
+                export "export-system" 
+                peer-as 65100         
+                neighbor 10.3.5.3
+                    shutdown
+                exit
+                neighbor 10.10.100.3
+                exit
+            exit
+            no shutdown
+        exit
+    exit
+
+
+exit all

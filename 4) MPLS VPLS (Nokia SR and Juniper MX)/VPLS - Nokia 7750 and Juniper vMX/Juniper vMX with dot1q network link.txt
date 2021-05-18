@@ -1,0 +1,94 @@
+root@Juniper_vMX> show configuration
+## Last commit: 2017-04-14 15:00:35 UTC by root
+version 14.1R1.10;
+system {
+    host-name Juniper_vMX;
+    root-authentication {
+        encrypted-password "$1$4Z0LedNc$YMGAiR6JZEre.L7RuIwQw/"; ## SECRET-DATA
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        unit 0 {
+            family inet {
+                address 10.7.9.9/27;
+            }
+            family mpls;
+        }
+    }
+    ge-0/0/1 {
+        flexible-vlan-tagging;
+        unit 0 {
+            vlan-id 123;
+            family inet {
+                address 10.8.9.9/27;
+            }
+            family mpls;
+        }
+    }
+    ge-0/0/2 {
+        encapsulation ethernet-vpls;
+        unit 0 {
+            family vpls;
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.10.100.9/32;
+            }
+        }
+    }
+}
+protocols {
+    mpls {
+        interface ge-0/0/1.0;
+        interface ge-0/0/1.123;
+    }
+    ospf {
+        area 0.0.0.0 {
+            interface ge-0/0/0.0 {
+                interface-type p2p;
+            }
+            interface lo0.0 {
+                passive;
+            }
+            interface ge-0/0/1.0 {
+                interface-type p2p;
+            }
+            interface ge-0/0/1.123;
+        }
+    }
+    ldp {
+        interface ge-0/0/0.0;
+        interface ge-0/0/1.0;
+        interface lo0.0;
+    }
+}
+routing-instances {
+    v1 {
+        instance-type vpls;
+        interface ge-0/0/2.0;
+        protocols {
+            vpls {
+                no-tunnel-services;
+                vpls-id 400;
+                neighbor 10.10.100.7;
+                neighbor 10.10.100.8;
+            }
+        }
+    }
+}
+

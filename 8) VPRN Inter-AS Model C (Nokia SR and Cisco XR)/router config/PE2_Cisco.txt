@@ -1,0 +1,144 @@
+RP/0/0/CPU0:PE2_Cisco#show runn
+Thu Nov  2 22:57:10.359 UTC
+Building configuration...
+!! IOS XR Configuration 6.0.0
+!! Last configuration change at Thu Nov  2 22:52:16 2017 by cisco
+!
+hostname PE2_Cisco
+vrf 500
+ address-family ipv4 unicast
+  import route-target
+   112233:500
+  !
+  export route-target
+   112233:500
+  !
+ !
+!
+line console
+ exec-timeout 0 0
+!
+line default
+ exec-timeout 0 0
+!
+interface Loopback0
+ description "system"
+ ipv4 address 172.0.0.2 255.255.255.255
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/1
+ description "to ASBR2_Cisco"
+ ipv4 address 10.2.22.2 255.255.255.0
+!
+interface GigabitEthernet0/0/0/2
+ shutdown
+!
+interface GigabitEthernet0/0/0/3
+ shutdown
+!
+interface GigabitEthernet0/0/0/4
+ shutdown
+!
+interface GigabitEthernet0/0/0/5
+ description "to PC2"
+ vrf 500
+ ipv4 address 192.168.2.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0/6
+ shutdown
+!
+interface GigabitEthernet0/0/0/7
+ shutdown
+!
+route-policy IN
+  pass
+end-policy
+!
+route-policy OUT
+  pass
+end-policy
+!
+route-policy RP_IPV4_BGP_LU
+  if destination in PS_IPV4_BGP_LU_LOOPBACKS then
+    pass
+  endif
+end-policy
+!
+route-policy RP_BGP_VPN_AS65001_IN
+  if extcommunity rt matches-any (ios-regex '112233:*') then
+    pass
+  endif
+end-policy
+!
+route-policy RP_BGP_VPN_AS65001_OUT
+  if extcommunity rt matches-any (ios-regex '112233:*') then
+    pass
+  endif
+end-policy
+!
+router ospf 1
+ mpls ldp auto-config
+ address-family ipv4
+ area 0.0.0.0
+  interface Loopback0
+  !
+  interface GigabitEthernet0/0/0/1
+  !
+ !
+!
+router bgp 65002
+ bgp router-id 172.0.0.2
+ bgp log neighbor changes detail
+ address-family ipv4 unicast
+  network 172.0.0.22/32
+  allocate-label all
+ !
+ address-family vpnv4 unicast
+ !
+ neighbor 172.0.0.1
+  remote-as 65001
+  ebgp-multihop 200
+  description "MP-eBGP to PE1_Nokia. NH via BGP label-ipv4. AF = vpnv4"
+  update-source Loopback0
+  address-family vpnv4 unicast
+   route-policy IN in
+   route-policy OUT out
+  !
+ !
+ neighbor 172.0.0.3
+  remote-as 65003
+  ebgp-multihop 200
+  description "MP-eBGP to PE3_Nokia. NH via BGP label-ipv4. AF = vpnv4"
+  update-source Loopback0
+  address-family vpnv4 unicast
+   route-policy IN in
+   route-policy OUT out
+  !
+ !
+ neighbor 172.0.0.22
+  remote-as 65002
+  description "iBGP to ASBR2_Cisco. NH via OSPF. AF = label-ipv4"
+  update-source Loopback0
+  address-family ipv4 labeled-unicast
+   next-hop-self
+  !
+ !
+ vrf 500
+  rd 172.0.0.2:500
+  address-family ipv4 unicast
+   redistribute connected
+  !
+ !
+!
+mpls oam
+!
+mpls ldp
+ address-family ipv4
+ !
+!
+end

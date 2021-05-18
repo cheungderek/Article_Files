@@ -1,0 +1,61 @@
+RP/0/0/CPU0:ASBR2_Cisco#show bgp ipv4 labeled-unicast 
+Thu Nov  2 15:38:42.149 UTC
+BGP router identifier 172.0.0.22, local AS number 65002
+BGP generic scan interval 60 secs
+Non-stop routing is enabled
+BGP table state: Active
+Table ID: 0xe0000000   RD version: 52
+BGP main routing table version 52
+BGP NSR Initial initsync version 8 (Reached)
+BGP NSR/ISSU Sync-Group versions 0/0
+BGP scan interval 60 secs
+
+Status codes: s suppressed, d damped, h history, * valid, > best
+              i - internal, r RIB-failure, S stale, N Nexthop-discard
+Origin codes: i - IGP, e - EGP, ? - incomplete
+   Network            Next Hop            Metric LocPrf Weight Path
+*> 172.0.0.1/32       10.11.22.11           1000             0 65001 i
+*                     10.22.33.33                            0 65003 65001 i
+*>i172.0.0.2/32       10.2.22.2                0    100      0 i
+*  172.0.0.3/32       10.11.22.11                            0 65001 65003 i
+*>                    10.22.33.33           1000             0 65003 i
+*> 172.0.0.11/32      10.11.22.11                            0 65001 i
+*                     10.22.33.33                            0 65003 65001 i
+*> 172.0.0.22/32      0.0.0.0                  0         32768 i
+*  172.0.0.33/32      10.11.22.11                            0 65001 65003 i
+*>                    10.22.33.33                            0 65003 i
+
+Processed 6 prefixes, 10 paths
+
+
+
+RP/0/0/CPU0:ASBR2_Cisco#show route
+Thu Nov  2 15:39:03.738 UTC
+
+Codes: C - connected, S - static, R - RIP, B - BGP, (>) - Diversion path
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP
+       i - ISIS, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, su - IS-IS summary null, * - candidate default
+       U - per-user static route, o - ODR, L - local, G  - DAGR, l - LISP
+       A - access/subscriber, a - Application route
+       M - mobile route, r - RPL, (!) - FRR Backup path
+
+Gateway of last resort is not set
+
+C    10.2.22.0/24 is directly connected, 14:45:02, GigabitEthernet0/0/0/2
+L    10.2.22.22/32 is directly connected, 14:45:02, GigabitEthernet0/0/0/2
+C    10.11.22.0/24 is directly connected, 14:45:02, GigabitEthernet0/0/0/0
+S    10.11.22.11/32 is directly connected, 01:31:52, GigabitEthernet0/0/0/0
+L    10.11.22.22/32 is directly connected, 14:45:02, GigabitEthernet0/0/0/0
+C    10.22.33.0/24 is directly connected, 02:06:27, GigabitEthernet0/0/0/1
+L    10.22.33.22/32 is directly connected, 02:06:27, GigabitEthernet0/0/0/1
+S    10.22.33.33/32 is directly connected, 02:03:28, GigabitEthernet0/0/0/1
+L    127.0.0.0/8 [0/0] via 0.0.0.0, 14:45:10
+B    172.0.0.1/32 [20/1000] via 10.11.22.11, 01:12:53
+O    172.0.0.2/32 [110/2] via 10.2.22.2, 14:05:13, GigabitEthernet0/0/0/2
+B    172.0.0.3/32 [20/1000] via 10.22.33.33, 02:03:53
+B    172.0.0.11/32 [20/0] via 10.11.22.11, 01:12:53
+L    172.0.0.22/32 is directly connected, 14:45:02, Loopback0
+B    172.0.0.33/32 [20/0] via 10.22.33.33, 02:03:53

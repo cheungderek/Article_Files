@@ -1,0 +1,137 @@
+root@MX_Access> show configuration 
+## Last commit: 2017-11-20 02:27:48 UTC by root
+version 14.1R1.10;
+system {
+    host-name MX_Access;
+    default-address-selection;
+    root-authentication {
+        encrypted-password "$1$ldK6V0KH$H1rd.ft.URPD.9W2ZMhW9/"; ## SECRET-DATA
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        description "to MX4_RBR. Map to GNS3 eth2";
+        unit 0 {
+            family inet {
+                address 10.4.6.6/27;
+            }
+            family iso;
+            family mpls;
+        }
+    }
+    ge-0/0/1 {
+        description "to PC6. Map to GNS3 eth3";
+        encapsulation ethernet-vpls;
+        unit 0 {
+            family vpls;
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.10.100.6/32;
+            }
+            family iso {
+                address 49.0002.0000.0000.00;
+            }                           
+        }
+    }
+}
+routing-options {
+    rib inet.3 {
+        static {
+            route 10.10.100.9/32 next-table inet.0;
+            route 10.10.100.5/32 next-table inet.0;
+        }
+    }
+    router-id 10.10.100.6;
+    autonomous-system 65100;
+}
+protocols {
+    mpls {
+        interface ge-0/0/0.0;
+        interface lo0.0;
+    }
+    bgp {
+        group iBGP_RBR {
+            type internal;
+            local-address 10.10.100.6;
+            advertise-inactive;         
+            family inet {
+                labeled-unicast;
+            }
+            family inet-vpn {
+                unicast;
+            }
+            family l2vpn {
+                signaling;
+            }
+            export advertise.lo0;
+            neighbor 10.10.100.4;
+        }
+    }
+    isis {
+        ignore-attached-bit;
+        interface ge-0/0/0.0 {
+            point-to-point;
+            level 2 disable;
+        }
+        interface lo0.0 {
+            level 2 disable;
+            level 1 passive;
+        }                               
+    }
+    ldp {
+        interface ge-0/0/0.0;
+        interface lo0.0;
+    }
+}
+policy-options {
+    policy-statement advertise.lo0 {
+        term 1 {
+            from {
+                protocol direct;
+                route-filter 0.0.0.0/0 prefix-length-range /32-/32;
+            }
+            then accept;
+        }
+        term 2 {
+            then reject;
+        }
+    }
+    policy-statement reject-L1-into-L2 {
+        term 1 {
+            from {
+                protocol isis;          
+                level 1;
+            }
+            then reject;
+        }
+    }
+}
+routing-instances {
+    vpls400 {
+        instance-type vpls;
+        interface ge-0/0/1.0;
+        protocols {
+            vpls {
+                no-tunnel-services;
+                vpls-id 400;
+                neighbor 10.10.100.5;
+                neighbor 10.10.100.9;
+            }
+        }
+    }
+}
